@@ -1,9 +1,9 @@
-﻿using ApiBLL;
+﻿using Soltec.Business;
 using ApiCommon.Api;
 using ApiCommon.Entities.Transmision;
-using ApiDAL;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Soltec.DB;
 
 namespace Soltec.ServicioTransmisionAPI.Controllers
 {
@@ -13,16 +13,16 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
     {
         private readonly IConfiguration Configuration;
 
-        private readonly ILogger<TransmisionDAL> Logger;
+        private readonly ILogger<TransmisionDB> Logger;
 
-        private TransmisionBLL TransmisionBLL;
+        private TransmisionBusiness TransmisionBusiness;
         
-        public ServicioTransmisionController(IConfiguration configuration, ILogger<TransmisionDAL> logger)
+        public ServicioTransmisionController(IConfiguration configuration, ILogger<TransmisionDB> logger)
         {
             Configuration = configuration;
             Logger = logger;
 
-            TransmisionBLL = new TransmisionBLL(Configuration, logger);
+            TransmisionBusiness = new TransmisionBusiness(Configuration, logger);
         }
 
 
@@ -47,7 +47,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await TransmisionBLL.MarkOnLine(markOnlineBody);
+                await TransmisionBusiness.MarkOnLine(markOnlineBody);
 
                 return Ok(new ApiResponse());
             }
@@ -63,7 +63,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getProcesos = (await TransmisionBLL.GetProcesos()).ToList();
+                var getProcesos = (await TransmisionBusiness.GetProcesos()).ToList();
 
                 return Ok(new ApiResponse<ServicioProcesos>(getProcesos));
             }
@@ -73,21 +73,6 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("getConfiguracionV2/{sucursal}")]
-        public async Task<IActionResult> GetConfiguracionV2(string sucursal)
-        {
-            try
-            {
-                var getConfiguraiton = await TransmisionBLL.GetConfiguracion(sucursal);
-
-                return Ok(new ApiResponse<ServicioConfig>(getConfiguraiton));
-            }
-            catch (Exception ex)
-            {
-                return SoltecErrorMessage(ex);
-            }
-        }
 
         [Authorize]
         [HttpGet("getVersionesAppV2")]
@@ -95,7 +80,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getVersiones = (await TransmisionBLL.GetVersionesApp()).ToList();
+                var getVersiones = (await TransmisionBusiness.GetVersionesApp()).ToList();
 
                 return Ok(new ApiResponse<VersionesApp>(getVersiones));
             }
@@ -111,7 +96,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getVersiones = (await TransmisionBLL.ObtieneVersiones()).ToList();
+                var getVersiones = (await TransmisionBusiness.ObtieneVersiones()).ToList();
 
                 return Ok(new ApiResponse<VersionesApp>(getVersiones));
             }
@@ -126,7 +111,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getVersiones = (await TransmisionBLL.ObtieneVersiones_SimiPET()).ToList();
+                var getVersiones = (await TransmisionBusiness.ObtieneVersiones_SimiPET()).ToList();
 
                 return Ok(new ApiResponse<VersionesApp>(getVersiones));
             }
@@ -171,7 +156,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await TransmisionBLL.MarkOnLine(markOnlineBody);
+                await TransmisionBusiness.MarkOnLine(markOnlineBody);
 
                 return Ok(new ApiResponse());
             }
@@ -186,7 +171,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getProcesos = (await TransmisionBLL.GetProcesos()).ToList();
+                var getProcesos = (await TransmisionBusiness.GetProcesos()).ToList();
 
                 return Ok(new ApiResponse<ServicioProcesos>(getProcesos));
             }
@@ -202,7 +187,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getVersiones = (await TransmisionBLL.GetVersionesApp()).ToList();
+                var getVersiones = (await TransmisionBusiness.GetVersionesApp()).ToList();
 
                 return Ok(new ApiResponse<VersionesApp>(getVersiones));
             }
@@ -217,7 +202,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getVersiones = (await TransmisionBLL.GetMonitorDeApps()).ToList();
+                var getVersiones = (await TransmisionBusiness.GetMonitorDeApps()).ToList();
 
                 return Ok(new ApiResponse<MonitorDeApps>(getVersiones));
             }

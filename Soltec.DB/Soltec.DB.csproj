@@ -17,7 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ApiCommon\Soltec.ApiCommon.csproj" />
     <ProjectReference Include="..\Soltec.Common.Logger\Soltec.Common.Logger.csproj" />
-    <ProjectReference Include="..\Soltec.Orquestacion.Entidades\Soltec.Orquestacion.Entidades.csproj" />
+    <ProjectReference Include="..\Soltec.Orquestacion.Entidades\Soltec.Entidades.csproj" />
   </ItemGroup>
 
 </Project>

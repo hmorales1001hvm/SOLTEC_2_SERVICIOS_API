@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ApiBLL\Soltec.Business.csproj" />
     <ProjectReference Include="..\ApiCommon\Soltec.ApiCommon.csproj" />
+    <ProjectReference Include="..\Soltec.Business\Soltec.Business.csproj" />
     <ProjectReference Include="..\Soltec.Common.Logger\Soltec.Common.Logger.csproj" />
   </ItemGroup>
 

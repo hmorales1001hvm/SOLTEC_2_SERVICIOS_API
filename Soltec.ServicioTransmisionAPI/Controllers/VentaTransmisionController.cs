@@ -1,7 +1,7 @@
-﻿using ApiBLL;
+﻿using Soltec.Business;
 using ApiCommon.Api;
 using ApiCommon.Entities.Ventas;
-using ApiDAL;
+using Soltec.DB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Soltec.ApiCommon.Entities.Ventas;
@@ -14,18 +14,18 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 	{
 		private readonly IConfiguration Configuration;
 
-		private readonly ILogger<VentasDAL> Logger;
-        private readonly ILogger<SetDeTransmisionesDAL> Logger2;
-        public VentasBLL VentasBLL;
+		private readonly ILogger<VentasDB> Logger;
+        private readonly ILogger<SetDeTransmisionesDB> Logger2;
+        public VentasBusiness VentasBusiness;
         private readonly IWebHostEnvironment _env;
 
-        public VentaTransmisionController(IConfiguration configuration, ILogger<VentasDAL> logger, ILogger<SetDeTransmisionesDAL> logger2, IWebHostEnvironment env)
+        public VentaTransmisionController(IConfiguration configuration, ILogger<VentasDB> logger, ILogger<SetDeTransmisionesDB> logger2, IWebHostEnvironment env)
 		{
 			Configuration = configuration;
 			Logger = logger;
 			Logger2 = logger2;
             _env = env;
-            VentasBLL = new VentasBLL(Configuration,logger, logger2);
+            VentasBusiness = new VentasBusiness(Configuration,logger, logger2);
 		}
 
 		#region Requieren Token
@@ -35,7 +35,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 		{
 			try
 			{
-				var getSqlScripts = await VentasBLL.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
+				var getSqlScripts = await VentasBusiness.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
 
 				return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
 			}
@@ -142,7 +142,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
                     }
                 }
 
-                await VentasBLL.ActualizarEstatusHistorico(sucursal);
+                await VentasBusiness.ActualizarEstatusHistorico(sucursal);
 
                 return Ok(new ApiResponse { Success = true, Message = "Archivo(s) ZIP guardado(s) correctamente." });
             }
@@ -321,7 +321,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await VentasBLL.SincronizaScriptUltimo(data);
+                await VentasBusiness.SincronizaScriptUltimo(data);
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
@@ -338,7 +338,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await VentasBLL.ActualizaSucursalTransmision(data);
+                await VentasBusiness.ActualizaSucursalTransmision(data);
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
@@ -355,7 +355,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await VentasBLL.SincronizaScript_SimiPET(data);
+                await VentasBusiness.SincronizaScript_SimiPET(data);
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
@@ -374,7 +374,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                await VentasBLL.OnLineSalesSqlServerMultiple(data);
+                await VentasBusiness.OnLineSalesSqlServerMultiple(data);
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
@@ -390,7 +390,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 		{
 			try
 			{
-				var reporteExcel = await VentasBLL.GetReporteExcel(rfcEmpresa);
+				var reporteExcel = await VentasBusiness.GetReporteExcel(rfcEmpresa);
 
 				return File(reporteExcel, "application/octect-stream", $"ReporteVentasEnLiena.xlsx");
 
@@ -408,7 +408,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 		{
 			try
 			{
-				var getParametros = await VentasBLL.GetParametros(claveSimi);
+				var getParametros = await VentasBusiness.GetParametros(claveSimi);
 
 				return Ok(new ApiResponse<ParametrosGenerales>(getParametros));
 			}
@@ -427,7 +427,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getSqlScripts = await VentasBLL.GetSQLScripts(isOnLine, numeroSucursal);
+                var getSqlScripts = await VentasBusiness.GetSQLScripts(isOnLine, numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
@@ -443,7 +443,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getSqlScripts = await VentasBLL.GetSQLScriptsSQLite(numeroSucursal);
+                var getSqlScripts = await VentasBusiness.GetSQLScriptsSQLite(numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
@@ -459,7 +459,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getSqlScripts = await VentasBLL.ObtieneScripts(numeroSucursal);
+                var getSqlScripts = await VentasBusiness.ObtieneScripts(numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
@@ -475,7 +475,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getSqlScripts = await VentasBLL.ObtieneScriptsConCargaInicial(numeroSucursal);
+                var getSqlScripts = await VentasBusiness.ObtieneScriptsConCargaInicial(numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
@@ -493,7 +493,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
-                var getSqlScripts = await VentasBLL.ObtieneScripts_SIMIPET(numeroSucursal);
+                var getSqlScripts = await VentasBusiness.ObtieneScripts_SIMIPET(numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
@@ -514,7 +514,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 		{
 			try
 			{
-				var reporteExcel = await VentasBLL.GetReporteExcel(rfcEmpresa);
+				var reporteExcel = await VentasBusiness.GetReporteExcel(rfcEmpresa);
 
 				return File(reporteExcel, "application/octect-stream", $"ReporteVentasEnLiena.xlsx");
 
@@ -530,7 +530,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 		{
 			try
 			{
-				var getParametros = await VentasBLL.GetParametros(claveSimi);
+				var getParametros = await VentasBusiness.GetParametros(claveSimi);
 
 				return Ok(new ApiResponse<ParametrosGenerales>(getParametros));
 			}

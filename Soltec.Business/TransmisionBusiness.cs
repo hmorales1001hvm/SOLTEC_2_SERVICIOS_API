@@ -3,7 +3,7 @@ using Soltec.DB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace ApiBLL
+namespace Soltec.Business
 {
     public class TransmisionBusiness
     {

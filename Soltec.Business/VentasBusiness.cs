@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Soltec.ApiCommon.Entities.Ventas;
 
-namespace ApiBLL
+namespace Soltec.Business
 {
     public class VentasBusiness
     {

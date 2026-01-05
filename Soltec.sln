@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soltec.ApiCommon", "ApiComm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soltec.Common.Logger", "Soltec.Common.Logger\Soltec.Common.Logger.csproj", "{648248EB-4F6A-4594-8991-3E29F0ED2B70}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soltec.Orquestacion.Entidades", "Soltec.Orquestacion.Entidades\Soltec.Orquestacion.Entidades.csproj", "{15EF3354-5CE2-4B2F-A3FC-BF1A0458EEF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soltec.Entidades", "Soltec.Orquestacion.Entidades\Soltec.Entidades.csproj", "{15EF3354-5CE2-4B2F-A3FC-BF1A0458EEF9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soltec.Business", "Soltec.Business\Soltec.Business.csproj", "{8F1C649A-56AF-1668-C715-0EB98C22ECEB}"
 EndProject
