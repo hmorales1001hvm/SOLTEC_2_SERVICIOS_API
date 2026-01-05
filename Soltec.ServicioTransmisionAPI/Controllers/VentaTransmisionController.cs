@@ -1,10 +1,9 @@
 ﻿using Soltec.Business;
 using ApiCommon.Api;
-using ApiCommon.Entities.Ventas;
+using Soltec.Entities.Ventas;
 using Soltec.DB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Soltec.ApiCommon.Entities.Ventas;
 
 namespace Soltec.ServicioTransmisionAPI.Controllers
 {

@@ -30,6 +30,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Historicos\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&#xD;&#xA;      xcopy &quot;$(TargetDir)*&quot; &quot;C:\sistemas\Releases\Soltec.ServicioTransmisionAPI&quot; /E /I /Y&#xD;&#xA;)" />
   </Target>

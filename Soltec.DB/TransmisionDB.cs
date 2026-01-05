@@ -1,4 +1,4 @@
-﻿using ApiCommon.Entities.Transmision;
+﻿using Soltec.Entities.Transmision;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;

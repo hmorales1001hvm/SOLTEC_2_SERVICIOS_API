@@ -1,4 +1,4 @@
-﻿using ApiCommon.Entities.Ventas;
+﻿using Soltec.Entities.Ventas;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

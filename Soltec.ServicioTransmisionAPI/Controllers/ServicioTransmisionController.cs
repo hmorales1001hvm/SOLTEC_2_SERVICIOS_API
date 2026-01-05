@@ -1,6 +1,6 @@
 ﻿using Soltec.Business;
 using ApiCommon.Api;
-using ApiCommon.Entities.Transmision;
+using Soltec.Entities.Transmision;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Soltec.DB;
