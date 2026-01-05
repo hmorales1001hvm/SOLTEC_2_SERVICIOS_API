@@ -1,6 +1,0 @@
-@Soltec.ServicioTransmisionAPI_HostAddress = http://localhost:5199
-
-GET {{Soltec.ServicioTransmisionAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

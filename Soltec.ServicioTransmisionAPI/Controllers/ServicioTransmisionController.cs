@@ -196,21 +196,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             }
         }
 
-        [HttpGet("getConfiguracion/{sucursal}")]
-        public async Task<IActionResult> GetConfiguracion(string sucursal)
-        {
-            try
-            {
-                var getConfiguraiton = await TransmisionBLL.GetConfiguracion(sucursal);
-
-                return Ok(new ApiResponse<ServicioConfig>(getConfiguraiton));
-            }
-            catch (Exception ex)
-            {
-                return SoltecErrorMessage(ex);
-            }
-        }
-
+        
         [HttpGet("getVersionesApp")]
         public async Task<IActionResult> GetVersionesApp()
         {

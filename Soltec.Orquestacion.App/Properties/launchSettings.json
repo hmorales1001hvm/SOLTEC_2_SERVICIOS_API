@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Soltec.Orquestacion.App": {
-      "commandName": "Project",
-      "commandLineArgs": "12"
-    }
-  }
-}
