@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Soltec.Common.Logger\Soltec.Common.Logger.csproj" />
-    <ProjectReference Include="..\Soltec.Orquestacion.DA\Soltec.Orquestacion.DA.csproj" />
     <ProjectReference Include="..\Soltec.Orquestacion.Entidades\Soltec.Orquestacion.Entidades.csproj" />
   </ItemGroup>
 
