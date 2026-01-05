@@ -1,0 +1,30 @@
+DELIMITER //
+
+CREATE PROCEDURE enLinea.sp_GetParametros(
+	IN claveSimi VARCHAR(100)
+	)
+BEGIN
+    /*
+	Name Stored Procedure:	sp_EnLinea_GetParametros
+	Author:					Juan Carlos Valera Velazquez
+	Project:				Soltec App Transmision
+	Creation:				2024-05-16 11:19:00
+
+	Last Modification:      Juan Carlos Valera Velazquez
+	Modify by:              2024-05-16 11:19:00
+
+	Description:			Se crea stored procedure para configuracion 
+							para los paramtros generales
+	*/
+    select 
+		A.claveSimi, 
+		B.Intervalo, 
+		B.URLApi, 
+		B.PuertoApi, 
+		B.EndPointConfiguracion, 
+		B.EndPointSQLScripts, 
+		B.EndPointSincroniza  
+	from enLinea.Sincronizacion_Configuracion A
+	inner join enLinea.Sincronizacion_ParametrosGenerales B on A.idParametrosGenerales = B.idParametrosGenerales 
+	Where claveSimi = claveSimi;
+END

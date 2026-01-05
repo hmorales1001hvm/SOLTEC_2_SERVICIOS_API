@@ -1,0 +1,33 @@
+DELIMITER //
+
+CREATE PROCEDURE enLinea.sp_GetVentasEnLineaExcel(
+	IN rfcEmpresa VARCHAR(100)
+)
+BEGIN
+    /*
+	Name Stored Procedure:	sp_EnLinea_GetVentasEnLineaExcel
+	Author:					Juan Carlos Valera Velazquez
+	Project:				Soltec App Transmision
+	Creation:				2024-05-15 08:21:00
+
+	Last Modification:      Juan Carlos Valera Velazquez
+	Modify by:              2024-05-15 08:21:00
+
+	Description:			Consulta de datos para venta en linea 
+							por tipo de rfc. Datos para el reporte de Excel
+
+	*/
+	SELECT
+		V.sucursal, 
+	  	s.nombre, 
+  		V.fecha , 
+	  	V.venta , 
+	  	V.fechaRegistro  
+  	from ventaEnLinea V 
+  	inner join facturareal.sucursal s on s.claveSimi = V.sucursal 
+  	inner join facturareal.catempresa c on c.idEmpresa = s.idEmpresa 
+	where c.rfc = rfcEmpresa
+	order by 2;
+END
+
+DELIMITER ;

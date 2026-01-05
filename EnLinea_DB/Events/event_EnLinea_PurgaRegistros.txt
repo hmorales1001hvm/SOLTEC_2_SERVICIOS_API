@@ -1,0 +1,20 @@
+
+/*
+	Name Event:				event_EnLinea_PurgaRegistros
+	Author:					Juan Carlos Valera Velazquez
+	Project:				Soltec App Transmision
+	Creation:				2024-05-20 09:16:00
+
+	Last Modification:      Juan Carlos Valera Velazquez
+	Modify by:              2024-05-20 09:16:00
+
+	Description:			Se crea evento para la ejecucion de stored procedure
+							y empezar con nuevos registros dia a dia.
+*/
+
+CREATE EVENT event_EnLinea_PurgaRegistros
+ON SCHEDULE EVERY 24 HOUR
+STARTS '2024-09-27 00:30:00.000'
+ON COMPLETION PRESERVE
+ENABLE
+DO CALL facturareal.sp_EnLinea_PurgaRegistros

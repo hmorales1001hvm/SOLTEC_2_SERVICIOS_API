@@ -1,0 +1,22 @@
+DELIMITER //
+
+CREATE PROCEDURE sp_EnLinea_GetSqlScripts()
+BEGIN
+    /*
+	Name Stored Procedure:	sp_EnLinea_GetSqlScripts
+	Author:					Juan Carlos Valera Velazquez
+	Project:				Soltec App Transmision
+	Creation:				2024-05-10 11:44:00
+
+	Last Modification:      Juan Carlos Valera Velazquez
+	Modify by:              2024-05-10 11:44:00
+
+	Description:			Obtiene query para ser ejecutado
+	*/
+    SELECT 
+    	SS.IdSqlScript,
+		SS.ScriptTexto
+	FROM EnLinea_Sincronizacion_SqlScript SS;
+END
+
+DELIMITER ;

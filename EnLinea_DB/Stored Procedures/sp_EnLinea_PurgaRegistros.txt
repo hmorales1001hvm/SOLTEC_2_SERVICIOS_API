@@ -1,0 +1,20 @@
+DELIMITER //
+
+CREATE PROCEDURE facturareal.sp_EnLinea_PurgaRegistros()
+BEGIN
+    /*
+	Name Stored Procedure:	sp_EnLinea_PurgaRegistros
+	Author:					Juan Carlos Valera Velazquez
+	Project:				Soltec App Transmision
+	Creation:				2024-05-20 09:16:00
+
+	Last Modification:      Juan Carlos Valera Velazquez
+	Modify by:              2024-05-20 09:16:00
+
+	Description:			Se purgan datos para empezar con 
+							nuevos registros dia a dia 
+	*/
+   DELETE FROM facturareal.EnLinea_VentaEnLinea a WHERE a.fecha < DATE_FORMAT(CURDATE(), '%Y-%m-%d');
+END
+
+DELIMITER ;

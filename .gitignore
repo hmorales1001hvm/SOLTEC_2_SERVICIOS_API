@@ -1,0 +1,52 @@
+# ===============================
+# Visual Studio / Visual Studio Code
+# ===============================
+.vs/
+.vscode/
+
+# ===============================
+# Archivos de usuario
+# ===============================
+*.user
+*.suo
+*.userosscache
+*.userprefs
+
+# ===============================
+# Compilados .NET
+# ===============================
+bin/
+obj/
+
+# ===============================
+# Paquetes
+# ===============================
+packages/
+
+# ===============================
+# Publicación
+# ===============================
+*.pubxml
+*.pubxml.user
+
+# ===============================
+# Configuración sensible (NO subir)
+# ===============================
+App.config
+*.config
+*.settings
+Settings*.settings
+Settings*.Designer.cs
+
+# ===============================
+# Bases de datos locales
+# ===============================
+*.mdf
+*.ldf
+*.dbmdl
+*.jfm
+
+# ===============================
+# Carpetas de respaldo
+# ===============================
+RESPALDOS/
