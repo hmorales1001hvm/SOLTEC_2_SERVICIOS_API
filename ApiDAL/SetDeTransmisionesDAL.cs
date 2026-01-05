@@ -7,8 +7,6 @@ using Soltec.ApiCommon.Entities.Ventas;
 using Soltec.Common.Logger;
 using System.Data;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Collections.Concurrent;
 
 namespace ApiDAL
 {
