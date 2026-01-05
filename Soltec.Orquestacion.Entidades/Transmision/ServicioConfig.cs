@@ -1,4 +1,4 @@
-﻿namespace ApiCommon.Entities.Transmision
+﻿namespace Soltec.Entities.Transmision
 {
     public class ServicioConfig
     {

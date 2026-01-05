@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApiCommon.Entities.Ventas
+namespace Soltec.Entities.Ventas
 {
     public class VentasEnLineaBody
     {

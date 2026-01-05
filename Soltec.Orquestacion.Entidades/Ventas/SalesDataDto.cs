@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Soltec.ApiCommon.Entities.Ventas
+namespace Soltec.Entities.Ventas
 {
     public class SalesDataDto
     {

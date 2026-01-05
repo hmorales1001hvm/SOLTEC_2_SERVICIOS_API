@@ -1,4 +1,4 @@
-﻿using ApiCommon.Entities.Transmision;
+﻿using Soltec.Entities.Transmision;
 using Soltec.DB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

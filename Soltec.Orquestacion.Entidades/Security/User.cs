@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Soltec.ApiCommon.Entities.Security
+namespace Soltec.Entities.Security
 {
     public class User
     {

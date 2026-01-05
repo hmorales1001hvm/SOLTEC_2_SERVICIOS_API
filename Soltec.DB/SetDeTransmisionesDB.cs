@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using Soltec.ApiCommon.Entities.Ventas;
+using Soltec.Entities.Ventas;
 using Soltec.Common.Logger;
 using System.Data;
 using System.Text.Json;

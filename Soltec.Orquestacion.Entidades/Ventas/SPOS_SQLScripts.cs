@@ -1,4 +1,4 @@
-﻿namespace ApiCommon.Entities.Ventas
+﻿namespace Soltec.Entities.Ventas
 {
     public class SPOS_SQLScripts
     {

@@ -1,8 +1,7 @@
-﻿using ApiCommon.Entities.Ventas;
-using Soltec.DB;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Soltec.ApiCommon.Entities.Ventas;
+using Soltec.DB;
+using Soltec.Entities.Ventas;
 
 namespace Soltec.Business
 {
