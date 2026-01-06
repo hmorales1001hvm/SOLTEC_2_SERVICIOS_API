@@ -296,23 +296,6 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
 		}
 
-        //[RequestSizeLimit(209715200)]
-        ////[Authorize]
-        //[HttpPost("onLineSalesMultiple")]
-        //public async Task<IActionResult> onLineSalesMultiple([FromBody] ProcesosOnLine data)
-        //{
-        //    try
-        //    {
-        //        return Ok(new ApiResponse());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return SoltecErrorMessage(ex);
-        //    }
-
-        //}
-
-
         [RequestSizeLimit(524288000)]
         //[Authorize]
         [HttpPost("SincronizaScriptUltimo")]

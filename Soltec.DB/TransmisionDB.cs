@@ -66,16 +66,6 @@ namespace Soltec.DB
 
             try
             {
-                //using var connection = new MySqlConnection(dbConnection);
-                //await connection.OpenAsync();
-
-                //var servicios = await connection.QueryAsync<ServicioProcesos>(
-                //    query,
-                //    commandTimeout: 600
-                //);
-                //await connection.CloseAsync();
-
-                //return servicios;
                 return null;
             }
             catch (Exception ex)

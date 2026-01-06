@@ -7,18 +7,21 @@ namespace Soltec.Business
 {
     public class TransmisionBusiness
     {
-        private readonly IConfiguration Configuration;
-
-        private readonly ILogger<TransmisionDB> Logger;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<TransmisionBusiness> _logger;
 
         public TransmisionDB TransmisionDAL;
 
-        public TransmisionBusiness(IConfiguration configuration, ILogger<TransmisionDB> logger)
+        public TransmisionBusiness(IConfiguration configuration,
+                                   ILogger<TransmisionBusiness> logger,
+                                   ILoggerFactory loggerFactory) // LoggerFactory para DAL
         {
-            Configuration = configuration;
-            Logger = logger;
+            _configuration = configuration;
+            _logger = logger;
 
-            TransmisionDAL = new TransmisionDB(configuration,logger);
+            // Crear logger tipado para TransmisionDB
+            var transmisionDbLogger = loggerFactory.CreateLogger<TransmisionDB>();
+            TransmisionDAL = new TransmisionDB(configuration, transmisionDbLogger);
         }
 
         public async Task MarkOnLine(MarkOnlineBody markOnlineBody)
@@ -26,10 +29,13 @@ namespace Soltec.Business
             try
             {
                 await TransmisionDAL.MarkOnLine(markOnlineBody);
+                _logger.LogInformation("Sucursal {@Sucursal} registrada con la version {@Version1}",
+                                        markOnlineBody.Sucursal, markOnlineBody.Version1);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Sucursal: {markOnlineBody.Sucursal} - Error al registrar la sucursal con la version: {markOnlineBody.Version1}");
+                _logger.LogError(ex, "Error al registrar la sucursal {@Sucursal} con la version {@Version1}",
+                                 markOnlineBody.Sucursal, markOnlineBody.Version1);
             }
         }
 
@@ -37,14 +43,14 @@ namespace Soltec.Business
         {
             try
             {
-                var getProcesos = await TransmisionDAL.GetProcesos();
-
-                return getProcesos;
+                var procesos = await TransmisionDAL.GetProcesos();
+                _logger.LogInformation("Se obtuvieron {@Count} procesos", procesos?.Count() ?? 0);
+                return procesos;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Ocurrio un error al obtener los procesos.");
-                return null;
+                _logger.LogError(ex, "Ocurrió un error al obtener los procesos");
+                return Enumerable.Empty<ServicioProcesos>();
             }
         }
 
@@ -53,15 +59,14 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.GetVersionesApp();
-
+                _logger.LogInformation("Se obtuvieron {@Count} versiones de app", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Ocurrio un error al obtener las lista de versiones.");
-				return null;
-			}
-            
+                _logger.LogError(ex, "Error al obtener lista de versiones de app");
+                return Enumerable.Empty<VersionesApp>();
+            }
         }
 
         public async Task<IEnumerable<VersionesApp>> ObtieneVersiones()
@@ -69,15 +74,14 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.ObtieneVersiones();
-
+                _logger.LogInformation("Se obtuvieron {@Count} versiones activas", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Ocurrio un error al obtener las lista de versiones.");
-                return null;
+                _logger.LogError(ex, "Ocurrió un error al obtener las versiones activas");
+                return Enumerable.Empty<VersionesApp>();
             }
-
         }
 
         public async Task<IEnumerable<VersionesApp>> ObtieneVersiones_SimiPET()
@@ -85,15 +89,14 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.ObtieneVersiones_SimiPET();
-
+                _logger.LogInformation("Se obtuvieron {@Count} versiones activas SimiPET", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Ocurrio un error al obtener las lista de versiones.");
-                return null;
+                _logger.LogError(ex, "Ocurrió un error al obtener las versiones activas SimiPET");
+                return Enumerable.Empty<VersionesApp>();
             }
-
         }
 
         public async Task<IEnumerable<MonitorDeApps>> GetMonitorDeApps()
@@ -101,16 +104,14 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.GetMonitorDeApps();
-
+                _logger.LogInformation("Se obtuvieron {@Count} registros de Monitor de Apps", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Ocurrio un error al obtener las lista de Monitor de Apps.");
-                return null;
+                _logger.LogError(ex, "Ocurrió un error al obtener Monitor de Apps");
+                return Enumerable.Empty<MonitorDeApps>();
             }
-
         }
-
     }
 }
