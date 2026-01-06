@@ -27,7 +27,6 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             _transmisionBusiness = new TransmisionBusiness(configuration, transmisionBusinessLogger, loggerFactory);
         }
 
-        // Helper para loggear la sucursal opcional
         private void LogSucursal(string? sucursal, string mensaje)
         {
             if (!string.IsNullOrEmpty(sucursal))

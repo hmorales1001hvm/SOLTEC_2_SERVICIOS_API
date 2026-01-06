@@ -13,36 +13,45 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 	{
 		private readonly IConfiguration Configuration;
 
-		private readonly ILogger<VentasDB> Logger;
-        private readonly ILogger<SetDeTransmisionesDB> Logger2;
+		//private readonly ILogger<VentasDB> Logger;
+  //      private readonly ILogger<SetDeTransmisionesDB> Logger2;
         public VentasBusiness VentasBusiness;
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger<VentaTransmisionController> _logger;
 
-        public VentaTransmisionController(IConfiguration configuration, ILogger<VentasDB> logger, ILogger<SetDeTransmisionesDB> logger2, IWebHostEnvironment env)
-		{
-			Configuration = configuration;
-			Logger = logger;
-			Logger2 = logger2;
+
+        public VentaTransmisionController(  IConfiguration configuration,
+                                            ILogger<VentasDB> logger,
+                                            ILogger<SetDeTransmisionesDB> logger2,
+                                            ILogger<VentaTransmisionController> controllerLogger,
+                                            IWebHostEnvironment env)
+        {
+            Configuration = configuration;
+            //Logger = logger;
+            //Logger2 = logger2;
+            _logger = controllerLogger;
             _env = env;
-            VentasBusiness = new VentasBusiness(Configuration,logger, logger2);
-		}
 
-		#region Requieren Token
-		[Authorize]
-		[HttpGet("getSPOS_SQLScripts/{numeroSucursal}/{isOnLine}")]
-		public async Task<IActionResult> GetSPOS_SQLScripts(string numeroSucursal, bool isOnLine)
-		{
-			try
-			{
-				var getSqlScripts = await VentasBusiness.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
+            VentasBusiness = new VentasBusiness(Configuration, logger, logger2);
+        }
 
-				return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
-			}
-			catch (Exception ex)
-			{
-                return SoltecErrorMessage(ex);
-            }
-		}
+
+        #region Requieren Token
+        //[Authorize]
+        //[HttpGet("getSPOS_SQLScripts/{numeroSucursal}/{isOnLine}")]
+        //public async Task<IActionResult> GetSPOS_SQLScripts(string numeroSucursal, bool isOnLine)
+        //{
+        //	try
+        //	{
+        //		var getSqlScripts = await VentasBusiness.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
+
+        //		return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //              return SoltecErrorMessage(ex);
+        //          }
+        //}
 
         [HttpGet("healt")]
         public async Task<IActionResult> Healt()
@@ -70,44 +79,90 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             });
         }
 
+        //      [Authorize]
+        //[HttpPost("uploadFileZIP")]
+        //[DisableRequestSizeLimit]
+        //[RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue, ValueLengthLimit = int.MaxValue)]
+        //public async Task<IActionResult> UploadFileZIP()
+        //{
+        //	try
+        //	{
+        //		if (!Request.Form.Files.Any())
+        //			return Ok(new ApiResponse());
+
+        //		string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        //		if (!Directory.Exists(pathToSave))
+        //			Directory.CreateDirectory(pathToSave);
+        //		if (!Directory.Exists(pathToSave + "\\Operativas"))
+        //			Directory.CreateDirectory(pathToSave + "\\Operativas");
+        //		if (!Directory.Exists(pathToSave + "\\Catalogos"))
+        //			Directory.CreateDirectory(pathToSave + "\\Catalogos");
+
+        //		foreach (IFormFile file in Request.Form.Files)
+        //		{
+        //			string fullPath = string.Empty;
+        //			if (file.FileName.Contains("Operativas"))
+        //				fullPath = Path.Combine(pathToSave + "\\Operativas", file.FileName);
+        //			else
+        //				fullPath = Path.Combine(pathToSave + "\\Catalogos", file.FileName);
+
+        //			using FileStream stream = new(fullPath, FileMode.Create);
+        //			file.CopyTo(stream);
+        //		}
+        //		return Ok(new ApiResponse());
+        //	}
+
+        //	catch (Exception ex)
+        //	{
+        //		return SoltecErrorMessage(ex);
+        //	}
+        //}
+
+
         [Authorize]
-		[HttpPost("uploadFileZIP")]
-		[DisableRequestSizeLimit]
-		[RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue, ValueLengthLimit = int.MaxValue)]
-		public async Task<IActionResult> UploadFileZIP()
-		{
-			try
-			{
-				if (!Request.Form.Files.Any())
-					return Ok(new ApiResponse());
+        [HttpPost("uploadFileZIP")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue, ValueLengthLimit = int.MaxValue)]
+        public async Task<IActionResult> UploadFileZIP([FromHeader(Name = "Sucursal")] string? sucursalHeader = null)
+        {
+            try
+            {
+                _logger.LogInformation("UploadFileZIP iniciado | HeaderSucursal={HeaderSucursal}", sucursalHeader);
 
-				string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-				if (!Directory.Exists(pathToSave))
-					Directory.CreateDirectory(pathToSave);
-				if (!Directory.Exists(pathToSave + "\\Operativas"))
-					Directory.CreateDirectory(pathToSave + "\\Operativas");
-				if (!Directory.Exists(pathToSave + "\\Catalogos"))
-					Directory.CreateDirectory(pathToSave + "\\Catalogos");
+                if (!Request.Form.Files.Any())
+                    return Ok(new ApiResponse());
 
-				foreach (IFormFile file in Request.Form.Files)
-				{
-					string fullPath = string.Empty;
-					if (file.FileName.Contains("Operativas"))
-						fullPath = Path.Combine(pathToSave + "\\Operativas", file.FileName);
-					else
-						fullPath = Path.Combine(pathToSave + "\\Catalogos", file.FileName);
+                string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
 
-					using FileStream stream = new(fullPath, FileMode.Create);
-					file.CopyTo(stream);
-				}
-				return Ok(new ApiResponse());
-			}
+                Directory.CreateDirectory(pathToSave);
+                Directory.CreateDirectory(Path.Combine(pathToSave, "Operativas"));
+                Directory.CreateDirectory(Path.Combine(pathToSave, "Catalogos"));
 
-			catch (Exception ex)
-			{
-				return SoltecErrorMessage(ex);
-			}
-		}
+                foreach (IFormFile file in Request.Form.Files)
+                {
+                    string destino = file.FileName.Contains("Operativas")
+                        ? Path.Combine(pathToSave, "Operativas", file.FileName)
+                        : Path.Combine(pathToSave, "Catalogos", file.FileName);
+
+                    using var stream = new FileStream(destino, FileMode.Create);
+                    await file.CopyToAsync(stream);
+                }
+
+                _logger.LogInformation(
+                    "UploadFileZIP finalizado correctamente | HeaderSucursal={HeaderSucursal}",
+                    sucursalHeader
+                );
+
+                return Ok(new ApiResponse());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en UploadFileZIP | HeaderSucursal={HeaderSucursal}", sucursalHeader
+                );
+                return SoltecErrorMessage(ex);
+            }
+        }
+
 
 
         //[Authorize]
@@ -126,7 +181,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
                 // Carpeta Historicos en el directorio actual de la app
                 string pathToSave = Path.Combine(_env.ContentRootPath, "Historicos");
-                Logger.LogInformation($"RUTA DEL HISTORICO: {pathToSave}");
+                _logger.LogInformation($"Ruta del histórico: {pathToSave}, sucursal: {sucursal}");
 
                 if (!Directory.Exists(pathToSave))
                     Directory.CreateDirectory(pathToSave);
@@ -147,12 +202,10 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.Message);
+                _logger.LogError(ex, $"Error en SincronizaScriptZipAsync: {sucursal}");
                 return SoltecErrorMessage(ex);
             }
         }
-
-
 
         [HttpGet("DescargarScriptZip")]
         public async Task<IActionResult> DescargarScriptZip([FromQuery] string sucursal)
@@ -281,50 +334,93 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
 
         //[Authorize]
-        [HttpPost("onLineSales")]
-		public async Task<IActionResult> OnLineSales([FromBody] ProcesosOnLine data)
-		{
-			try
-			{
-				//await VentasBLL.OnLineSales(data);
-				return Ok(new ApiResponse());
-			}
-			catch (Exception ex)
-			{
-				return SoltecErrorMessage(ex);
-			}
+        //      [HttpPost("onLineSales")]
+        //public async Task<IActionResult> OnLineSales([FromBody] ProcesosOnLine data)
+        //{
+        //	try
+        //	{
 
-		}
+        //		return Ok(new ApiResponse());
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		return SoltecErrorMessage(ex);
+        //	}
+
+        //}
 
         [RequestSizeLimit(524288000)]
-        //[Authorize]
         [HttpPost("SincronizaScriptUltimo")]
-        public async Task<IActionResult> SincronizaScriptUltimo([FromBody] ProcesosOnLine data)
+        public async Task<IActionResult> SincronizaScriptUltimo([FromBody] ProcesosOnLine data, [FromHeader(Name = "Sucursal")] string? sucursalHeader = null)
         {
             try
             {
+                _logger.LogInformation("SincronizaScriptUltimo iniciado | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 await VentasBusiness.SincronizaScriptUltimo(data);
+
+                _logger.LogInformation("SincronizaScriptUltimo finalizado correctamente | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error en SincronizaScriptUltimo | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 return SoltecErrorMessage(ex);
             }
         }
 
 
-        [RequestSizeLimit(524288000)]
         //[Authorize]
+        //[HttpPost("SincronizaScriptUltimo")]
+        //public async Task<IActionResult> SincronizaScriptUltimo([FromBody] ProcesosOnLine data)
+        //{
+        //    try
+        //    {
+        //        await VentasBusiness.SincronizaScriptUltimo(data);
+        //        return Ok(new ApiResponse());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return SoltecErrorMessage(ex);
+        //    }
+        //}
+
+
+
+        //[Authorize]
+        //[HttpPost("ActualizaSucursalTransmision")]
+        //public async Task<IActionResult> ActualizaSucursalTransmision([FromBody] ProcesosOnLine data)
+        //{
+        //    try
+        //    {
+        //        await VentasBusiness.ActualizaSucursalTransmision(data);
+        //        return Ok(new ApiResponse());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return SoltecErrorMessage(ex);
+        //    }
+        //}
+        [RequestSizeLimit(524288000)]
         [HttpPost("ActualizaSucursalTransmision")]
-        public async Task<IActionResult> ActualizaSucursalTransmision([FromBody] ProcesosOnLine data)
+        public async Task<IActionResult> ActualizaSucursalTransmision([FromBody] ProcesosOnLine data, [FromHeader(Name = "Sucursal")] string? sucursalHeader = null)
         {
             try
             {
+                _logger.LogInformation("ActualizaSucursalTransmision iniciado | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 await VentasBusiness.ActualizaSucursalTransmision(data);
+
+                _logger.LogInformation("ActualizaSucursalTransmision finalizado correctamente | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 return Ok(new ApiResponse());
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error en ActualizaSucursalTransmision | HeaderSucursal={HeaderSucursal}", sucursalHeader);
+
                 return SoltecErrorMessage(ex);
             }
         }
@@ -349,21 +445,21 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
         
 
-        [RequestSizeLimit(52428800)]
-        //[Authorize]
-        [HttpPost("onLineSalesSqlServerMultiple")]
-        public async Task<IActionResult> onLineSalesSqlServerMultiple([FromBody] ProcesosOnLine data)
-        {
-            try
-            {
-                await VentasBusiness.OnLineSalesSqlServerMultiple(data);
-                return Ok(new ApiResponse());
-            }
-            catch (Exception ex)
-            {
-                return SoltecErrorMessage(ex);
-            }
-        }
+        //[RequestSizeLimit(52428800)]
+        ////[Authorize]
+        //[HttpPost("onLineSalesSqlServerMultiple")]
+        //public async Task<IActionResult> onLineSalesSqlServerMultiple([FromBody] ProcesosOnLine data)
+        //{
+        //    try
+        //    {
+        //        await VentasBusiness.OnLineSalesSqlServerMultiple(data);
+        //        return Ok(new ApiResponse());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return SoltecErrorMessage(ex);
+        //    }
+        //}
 
 		// No implementado en ningún proyecto de la solución
 		[Authorize]
@@ -404,36 +500,36 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
         #region QUITAR ESTOS SERVICIOS CUANDO YA SE TENGA TODO HOMOLOGADO.
 
-        [HttpGet("getSQLScripts/{isOnLine}/{numeroSucursal}")]
-        public async Task<IActionResult> GetSQLScripts(bool isOnLine, string numeroSucursal)
-        {
-            try
-            {
-                var getSqlScripts = await VentasBusiness.GetSQLScripts(isOnLine, numeroSucursal);
+        //[HttpGet("getSQLScripts/{isOnLine}/{numeroSucursal}")]
+        //public async Task<IActionResult> GetSQLScripts(bool isOnLine, string numeroSucursal)
+        //{
+        //    try
+        //    {
+        //        var getSqlScripts = await VentasBusiness.GetSQLScripts(isOnLine, numeroSucursal);
 
-                return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
-            }
-            catch (Exception ex)
-            {
-                return SoltecErrorMessage(ex);
-            }
-        }
+        //        return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return SoltecErrorMessage(ex);
+        //    }
+        //}
 
 
-        [HttpGet("getSQLScriptsSQLite/{numeroSucursal}")]
-        public async Task<IActionResult> GetSQLScriptsSQLite(string numeroSucursal)
-        {
-            try
-            {
-                var getSqlScripts = await VentasBusiness.GetSQLScriptsSQLite(numeroSucursal);
+        //[HttpGet("getSQLScriptsSQLite/{numeroSucursal}")]
+        //public async Task<IActionResult> GetSQLScriptsSQLite(string numeroSucursal)
+        //{
+        //    try
+        //    {
+        //        var getSqlScripts = await VentasBusiness.GetSQLScriptsSQLite(numeroSucursal);
 
-                return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
-            }
-            catch (Exception ex)
-            {
-                return SoltecErrorMessage(ex);
-            }
-        }
+        //        return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return SoltecErrorMessage(ex);
+        //    }
+        //}
 
 
         [HttpGet("ObtieneScripts/{numeroSucursal}")]
@@ -457,18 +553,18 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         {
             try
             {
+                _logger.LogInformation("ObtieneScriptsConCargaInicial iniciado | Sucursal={Sucursal}", numeroSucursal);
                 var getSqlScripts = await VentasBusiness.ObtieneScriptsConCargaInicial(numeroSucursal);
+                _logger.LogInformation("ObtieneScriptsConCargaInicial finalizado correctamente | Sucursal={Sucursal}",numeroSucursal);
 
                 return Ok(new ApiResponse<SPOS_SQLScripts>(getSqlScripts));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex,"Error en ObtieneScriptsConCargaInicial | Sucursal={Sucursal}", numeroSucursal);
                 return SoltecErrorMessage(ex);
             }
         }
-
-        
-
 
         [HttpGet("ObtieneScripts_SIMIPET/{numeroSucursal}")]
         public async Task<IActionResult> ObtieneScripts_SIMIPET(string numeroSucursal)
@@ -481,6 +577,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error en SincronizaScriptUltimo: {numeroSucursal}");
                 return SoltecErrorMessage(ex);
             }
         }

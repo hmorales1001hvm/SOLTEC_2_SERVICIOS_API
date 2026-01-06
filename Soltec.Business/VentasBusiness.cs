@@ -24,21 +24,21 @@ namespace Soltec.Business
             SetDeTransmisionesDal = new SetDeTransmisionesDB(Configuration, Logger2);
         }
 
-        public async Task<List<SPOS_SQLScripts>> GetSQLScriptsSQLite(string numeroSucursal)
-        {
-            var result = new List<SPOS_SQLScripts>();
-            try
-            {
-                result = await VentasDB.GetSQLScriptsSQLite(numeroSucursal);
+        //public async Task<List<SPOS_SQLScripts>> GetSQLScriptsSQLite(string numeroSucursal)
+        //{
+        //    var result = new List<SPOS_SQLScripts>();
+        //    try
+        //    {
+        //        result = await VentasDB.GetSQLScriptsSQLite(numeroSucursal);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
-                throw;
-            }
-        }
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
+        //        throw;
+        //    }
+        //}
 
 
         public async Task<List<SPOS_SQLScripts>> ObtieneScripts(string numeroSucursal)
@@ -91,37 +91,37 @@ namespace Soltec.Business
             }
         }
 
-        public async Task<List<SPOS_SQLScripts>> GetSPOS_SQLScripts(string numeroSucursal, bool isOnLine)
-        {
-            var result = new List<SPOS_SQLScripts>();
-            try
-            {
-				result = await VentasDB.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
+   //     public async Task<List<SPOS_SQLScripts>> GetSPOS_SQLScripts(string numeroSucursal, bool isOnLine)
+   //     {
+   //         var result = new List<SPOS_SQLScripts>();
+   //         try
+   //         {
+			//	result = await VentasDB.GetSPOS_SQLScripts(numeroSucursal, isOnLine);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
-				throw;
-			}
-        }
+   //             return result;
+   //         }
+   //         catch (Exception ex)
+   //         {
+   //             Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
+			//	throw;
+			//}
+   //     }
 
-        public async Task<List<SPOS_SQLScripts>> GetSQLScripts( bool isOnLine, string numeroSucursal)
-        {
-            var result = new List<SPOS_SQLScripts>();
-            try
-            {
-                result = await VentasDB.GetSQLScripts(isOnLine, numeroSucursal);
+        //public async Task<List<SPOS_SQLScripts>> GetSQLScripts( bool isOnLine, string numeroSucursal)
+        //{
+        //    var result = new List<SPOS_SQLScripts>();
+        //    try
+        //    {
+        //        result = await VentasDB.GetSQLScripts(isOnLine, numeroSucursal);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
-                throw;
-            }
-        }
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
+        //        throw;
+        //    }
+        //}
         
         public async Task SincronizaScriptUltimo(ProcesosOnLine data)
         {
@@ -190,38 +190,21 @@ namespace Soltec.Business
         
 
 
-        public async Task OnLineSalesSqlServerMultiple(ProcesosOnLine data)
-        {
-            try
-            {
-                Logger.LogInformation($"Procesando el proceso ON LINE para : {data.NombreProceso}");
-                /////////////////////////////////////////////////await VentasDAL.OnLineSalesSqlServerMultiple(data);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Error al guardar el proceso en linea {data.NombreProceso}.");
-                throw;
+        //public async Task OnLineSalesSqlServerMultiple(ProcesosOnLine data)
+        //{
+        //    try
+        //    {
+        //        Logger.LogInformation($"Procesando el proceso ON LINE para : {data.NombreProceso}");
+        //        /////////////////////////////////////////////////await VentasDAL.OnLineSalesSqlServerMultiple(data);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.LogError(ex, $"Error al guardar el proceso en linea {data.NombreProceso}.");
+        //        throw;
 
-            }
-        }
+        //    }
+        //}
 
-
-    //    public async Task<List<VentasEnLinea>> GetVentasEnLinea(string rfcEmpresa)
-    //    {
-    //        var result = new List<VentasEnLinea>();
-    //        try
-    //        {
-    //            Logger.LogWarning($"Obteniendo ventas en linea para rfc empresa: {rfcEmpresa}");
-				//result = await VentasDAL.GetVentasEnLineaDAL(rfcEmpresa);
-
-    //            return result;
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, $"Ocurrio un error al obtener la venta en linea con respecto a la empresa: {rfcEmpresa}");
-    //            return result;
-    //        }
-    //    }
 
         public async Task<byte[]> GetReporteExcel(string rfcEmpresa)
         {
