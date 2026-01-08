@@ -3,8 +3,9 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using Soltec.Entities.Ventas;
 using Soltec.Common.Logger;
+using Soltec.Entities.Ventas;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;
 
@@ -152,8 +153,6 @@ namespace Soltec.DB
                             source.Procesado, source.FechaHoraVenta, source.TipoVenta);");
 
                 Logger.Important($"Ventas procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 2) VentasProductos
                 var ventasProductos = dto.VentasProductos?.Where(v => v.Id_Venta != null).ToList();
@@ -234,8 +233,6 @@ namespace Soltec.DB
                 ");
 
                 Logger.Important($"VentasProductos procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 3) VentasImpuestos
                 var ventasImpuestos = dto.VentasImpuestos?.Where(v => v.Id_Venta != null).ToList();
@@ -269,8 +266,6 @@ namespace Soltec.DB
                     VALUES (source.FechaOperacion, source.ClaveSimi, source.Id_Venta, source.Impuesto, source.TipoFactor, source.TasaImpuesto, source.ClaveSATImpuesto, source.BaseImpuesto, source.ImporteImpuesto, source.TipoOperacion);");
 
                 Logger.Important($"VentasImpuestos procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 4) VentasImpuestosDetalle
                 var ventasImpuestosDetalle = dto.VentasImpuestosDetalle?.Where(v => v.Id_Venta != null).ToList();
@@ -304,8 +299,6 @@ namespace Soltec.DB
                     VALUES (source.ClaveSimi, source.FechaOperacion, source.Id_Venta, source.Id_Producto, source.Impuesto, source.ClaveImpuesto, source.TasaImpuesto, source.TipoFactor, source.Base, source.ImporteIVA, source.ImporteVenta, source.TipoOperacion);");
 
                 Logger.Important($"VentasImpuestosDetalle procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 5) VentasDesgloceTotales
                 var ventasDesgloceTotales = dto.VentasDesgloceTotales?.Where(v => v.Id_Venta!=null).ToList();
@@ -334,8 +327,6 @@ namespace Soltec.DB
                     VALUES (source.ClaveSimi, source.FechaOperacion, source.Id_Venta, source.PrecioSinIVA, source.Importe, source.Descuento, source.Impuestos, source.Total, source.TipoOperacion);");
 
                 Logger.Important($"VentasDesgloseTotales procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 6) VentasImportesProductos
                 var ventasImportesProductos = dto.VentasImportesProductos?.Where(v => v.Id_Venta != null).ToList();
@@ -376,58 +367,80 @@ namespace Soltec.DB
                             source.ImpuestoCalculado, source.Total, source.TipoOperacion);");
 
                 Logger.Important($"VentasImportesProductos procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 // 7) VentasVendedorCuotas
                 Logger.Important($"Procesando VentasVendedorCuotas ({dto.VentasVendedorCuotas?.Count ?? 0})...");
                 var ventasVendedorCuotasConSucursal = dto.VentasVendedorCuotas
-                .Select(v => new VentasVendedorCuotasDto
-                {
-                    ClaveSimi = data.Sucursal,
-                    Fecha = v.Fecha,
-                    IdVendedor = v.IdVendedor,
-                    Nombre = v.Nombre,
-                    ImporteVenta = v.ImporteVenta,
-                    Transaccionesventa = v.Transaccionesventa,
-                    PorcVenta = v.PorcVenta,
-                    ImporteNaturistas = v.ImporteNaturistas,
-                    PorcNaturistas = v.PorcNaturistas,
-                    ImporteNocturno = v.ImporteNocturno,
-                    MontoDescuento = v.MontoDescuento,
-                    Menudeos = v.Menudeos,
-                    MontoIva = v.MontoIva
-                }).ToList();
-
+                     .Select(v => new VentasVendedorCuotasDto
+                     {
+                         ClaveSimi = data.Sucursal,
+                         Fecha = v.Fecha,
+                         IdVendedor = v.IdVendedor,
+                         Nombre = v.Nombre,
+                         ImporteVenta = v.ImporteVenta,
+                         Transaccionesventa = v.Transaccionesventa,
+                         PorcVenta = v.PorcVenta,
+                         ImporteNaturistas = v.ImporteNaturistas,
+                         PorcNaturistas = v.PorcNaturistas,
+                         ImporteNocturno = v.ImporteNocturno,
+                         MontoDescuento = v.MontoDescuento,
+                         Menudeos = v.Menudeos,
+                         MontoIva = v.MontoIva
+                     }).ToList();
 
                 await BulkMergeAsync(connection, ventasVendedorCuotasConSucursal, @"
-                CREATE TABLE #TempVentasVendedorCuotas (
-                    ClaveSimi VARCHAR(6) NOT NULL,
-                    Fecha DATETIME NOT NULL,
-                    IdVendedor VARCHAR(10) NOT NULL,
-                    Nombre VARCHAR(200) NOT NULL,
-                    ImporteVenta DECIMAL(12,2) NOT NULL,
-                    Transaccionesventa INT NOT NULL,
-                    PorcVenta DECIMAL(12,2) NOT NULL,
-                    ImporteNaturistas DECIMAL(12,2) NOT NULL,
-                    PorcNaturistas DECIMAL(12,2) NOT NULL,
-                    ImporteNocturno DECIMAL(12,2) NOT NULL,
-                    MontoDescuento DECIMAL(12,2) NOT NULL,
-                    Menudeos DECIMAL(12,2) NOT NULL,
-                    MontoIva DECIMAL(12,2) NOT NULL
-                );",
-                    "#TempVentasVendedorCuotas",
-                    @"
-                MERGE INTO VentasVendedorCuotas AS target
-                USING #TempVentasVendedorCuotas AS source
-                ON target.ClaveSimi = source.ClaveSimi AND target.Fecha = source.Fecha AND target.IdVendedor = source.IdVendedor
-                WHEN NOT MATCHED THEN
-                    INSERT (ClaveSimi, Fecha, IdVendedor, Nombre, ImporteVenta, Transaccionesventa, PorcVenta, ImporteNaturistas, PorcNaturistas, ImporteNocturno, MontoDescuento, Menudeos, MontoIva)
-                    VALUES (source.ClaveSimi, source.Fecha, source.IdVendedor, source.Nombre, source.ImporteVenta, source.Transaccionesventa, source.PorcVenta, source.ImporteNaturistas, source.PorcNaturistas, source.ImporteNocturno, source.MontoDescuento, source.Menudeos, source.MontoIva);");
+                                    CREATE TABLE #TempVentasVendedorCuotas (
+                                        ClaveSimi VARCHAR(6) NOT NULL,
+                                        Fecha DATETIME NOT NULL,
+                                        IdVendedor VARCHAR(10) NOT NULL,
+                                        Nombre VARCHAR(200) NOT NULL,
+                                        ImporteVenta DECIMAL(12,2) NOT NULL,
+                                        Transaccionesventa INT NOT NULL,
+                                        PorcVenta DECIMAL(12,2) NOT NULL,
+                                        ImporteNaturistas DECIMAL(12,2) NOT NULL,
+                                        PorcNaturistas DECIMAL(12,2) NOT NULL,
+                                        ImporteNocturno DECIMAL(12,2) NOT NULL,
+                                        MontoDescuento DECIMAL(12,2) NOT NULL,
+                                        Menudeos DECIMAL(12,2) NOT NULL,
+                                        MontoIva DECIMAL(12,2) NOT NULL
+                                    );",
+                                                    "#TempVentasVendedorCuotas",
+                                                    @"
+                                    MERGE INTO VentasVendedorCuotas AS target
+                                    USING #TempVentasVendedorCuotas AS source
+                                    ON target.ClaveSimi = source.ClaveSimi
+                                       AND CONVERT(VARCHAR,target.Fecha,112) = CONVERT(VARCHAR,source.Fecha,112)
+                                       AND target.IdVendedor = source.IdVendedor
 
-                Logger.Important($"VentasVendedorCuotas procesadas.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                                    WHEN MATCHED
+                                    THEN UPDATE SET 
+                                            target.Nombre = source.Nombre,
+                                            target.ImporteVenta = source.ImporteVenta,
+                                            target.Transaccionesventa = source.Transaccionesventa,
+                                            target.PorcVenta = source.PorcVenta,
+                                            target.ImporteNaturistas = source.ImporteNaturistas,
+                                            target.PorcNaturistas = source.PorcNaturistas,
+                                            target.ImporteNocturno = source.ImporteNocturno,
+                                            target.MontoDescuento = source.MontoDescuento,
+                                            target.Menudeos = source.Menudeos,
+                                            target.MontoIva = source.MontoIva
+
+                                    WHEN NOT MATCHED THEN
+                                        INSERT (
+                                            ClaveSimi, Fecha, IdVendedor, Nombre,
+                                            ImporteVenta, Transaccionesventa, PorcVenta,
+                                            ImporteNaturistas, PorcNaturistas, ImporteNocturno,
+                                            MontoDescuento, Menudeos, MontoIva
+                                        )
+                                        VALUES (
+                                            source.ClaveSimi, source.Fecha, source.IdVendedor, source.Nombre,
+                                            source.ImporteVenta, source.Transaccionesventa, source.PorcVenta,
+                                            source.ImporteNaturistas, source.PorcNaturistas, source.ImporteNocturno,
+                                            source.MontoDescuento, source.Menudeos, source.MontoIva
+                                        );
+                                    ");
+
+                Console.WriteLine($"VentasVendedorCuotas procesadas.");
 
 
                 var registrosValidos = dto.InventarioCosto?
@@ -463,8 +476,6 @@ namespace Soltec.DB
                                                                     ");
 
                 Logger.Important("Inventario Costo procesado.");
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
 
                 var registrosValidos2 = dto.SPOSInventario?
                     .Where(i => !string.IsNullOrWhiteSpace(i.ClaveSimi) && !string.IsNullOrWhiteSpace(i.Codigo))
@@ -611,9 +622,6 @@ namespace Soltec.DB
                     Logger.Important($"Error al hacer rollback SIMIPET: {rollEx.Message} - JSON - {data.Json}");
                     throw;
                 }
-
-                Logger.Important($"Error en SincronizaScript_SimiPET: {ex.Message}\n{ex.StackTrace} - JSON - {data.Json}");
-                throw;
             }
             finally
             {
@@ -624,9 +632,11 @@ namespace Soltec.DB
 
         public async Task ActualizaSucursalTransmision(ProcesosOnLine data)
         {
-            string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;";
+            //string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;";
+            if (!ConexionCacheService.TryGetConexion(data.Sucursal, out var conexion))
+                throw new Exception($"No existe configuración para ClaveSimi {data.Sucursal}");
 
-            using var connection = new SqlConnection(connString);
+            using var connection = new SqlConnection(conexion.ConnectionString);
 
             try
             {
@@ -704,8 +714,13 @@ namespace Soltec.DB
         {
 
 
-            string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;Max Pool Size=300;Min Pool Size=10;";
-            using var connection = new SqlConnection(connString);
+            //string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;Max Pool Size=300;Min Pool Size=10;";
+
+
+            if (!ConexionCacheService.TryGetConexion(data.Sucursal, out var conexion))
+                throw new Exception($"No existe configuración para ClaveSimi {data.Sucursal}");
+
+            using var connection = new SqlConnection(conexion.ConnectionString);
 
             var nombreProceso = string.Empty;
             
@@ -1357,6 +1372,17 @@ namespace Soltec.DB
             return result != null ? Convert.ToInt32(result) : 0;
         }
 
+    }
+
+    public class ConexionEmpresa
+    {
+        public string HostName { get; set; }
+        public string DatabaseName { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+
+        public string ConnectionString =>
+            $"Server={HostName};Database={DatabaseName};User Id={UserName};Password={Password};TrustServerCertificate=True;Connect Timeout=60;Max Pool Size=300;Min Pool Size=10;";
     }
 
 }
