@@ -73,11 +73,15 @@ namespace Soltec.DB
                 Logger.Info($"Actualizando sucursal {sucursal} a ESTATUS='RECIBIDO' en soltec2_Historicos");
 
                 var connectionString = Configuration.GetConnectionString("DbFacturaRealOrquestador");
+                var connectionStringSIMIPET = Configuration.GetConnectionString("DbSimiPET");
+                string cs = sucursal.Trim().Contains("VF") ? connectionStringSIMIPET : connectionString;
 
-                using var connection = new MySqlConnection(connectionString);
+                using var connection = new MySqlConnection(cs);
                 await connection.OpenAsync();
 
-                string sql = "UPDATE soltec2_Historicos SET Estatus = @Estatus, FechaRecibido=SYSDATE() WHERE ClaveSimi = @Sucursal AND Estatus='PENDIENTE'";
+                string sql = @"UPDATE soltec2_Historicos 
+                       SET Estatus = @Estatus, FechaRecibido = SYSDATE()
+                       WHERE ClaveSimi = @Sucursal AND Estatus = 'PENDIENTE'";
 
                 using var cmd = new MySqlCommand(sql, connection);
                 cmd.Parameters.AddWithValue("@Estatus", "RECIBIDO");
@@ -85,8 +89,6 @@ namespace Soltec.DB
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
                 Logger.Info($"Filas actualizadas: {rowsAffected}");
-
-                await connection.CloseAsync();
             }
             catch (Exception ex)
             {
@@ -94,6 +96,7 @@ namespace Soltec.DB
                 throw;
             }
         }
+
 
 
 
@@ -632,7 +635,6 @@ namespace Soltec.DB
 
         public async Task ActualizaSucursalTransmision(ProcesosOnLine data)
         {
-            //string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;";
             if (!ConexionCacheService.TryGetConexion(data.Sucursal, out var conexion))
                 throw new Exception($"No existe configuración para ClaveSimi {data.Sucursal}");
 
@@ -712,11 +714,6 @@ namespace Soltec.DB
 
         public async Task SincronizaSetDeTransmisionesSQLServerUltimo(ProcesosOnLine data)
         {
-
-
-            //string connString = $"Server={data.HostName};Database={data.DatabaseName};User Id={data.UserName};Password={data.Password};TrustServerCertificate=True;Connect Timeout=60;Max Pool Size=300;Min Pool Size=10;";
-
-
             if (!ConexionCacheService.TryGetConexion(data.Sucursal, out var conexion))
                 throw new Exception($"No existe configuración para ClaveSimi {data.Sucursal}");
 
@@ -724,15 +721,13 @@ namespace Soltec.DB
 
             var nombreProceso = string.Empty;
             
-            // Inicia transacción
-            //using var transaction = connection.BeginTransaction();
             try
             {
                 await connection.OpenAsync();
 
                 Logger.Important($"Iniciando SincronizaSetDeTransmisionesSQLServer - Sucursal: {data.Sucursal}");
 
-                // Deserializar DTO raíz
+
                 var dto = JsonSerializer.Deserialize<SalesDataDto>(data.Json) ?? new SalesDataDto();
 
                 // 1) Ventas

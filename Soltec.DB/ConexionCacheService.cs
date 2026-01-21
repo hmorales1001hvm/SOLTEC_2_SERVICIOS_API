@@ -47,11 +47,10 @@ public class ConexionCacheService : BackgroundService
             using var conn = new MySqlConnection(_mysqlConnection);
             await conn.OpenAsync();
 
-            const string sql = @"
-            SELECT a.HostName, a.UserName, a.Password, a.DatabaseName, s.claveSimi
-            FROM soltec2_orquestador_servidormysql_detalle a
-            INNER JOIN catempresa b ON a.IdEmpresa = b.idEmpresa
-            INNER JOIN sucursal s ON b.idEmpresa = s.idEmpresa";
+            const string sql = @"SELECT a.HostName, a.UserName, a.Password, a.DatabaseName, s.claveSimi
+                                 FROM soltec2_orquestador_servidormysql_detalle a
+                                 INNER JOIN catempresa b ON a.IdEmpresa = b.idEmpresa
+                                 INNER JOIN sucursal s ON b.idEmpresa = s.idEmpresa";
 
             using var cmd = new MySqlCommand(sql, conn);
             using var reader = await cmd.ExecuteReaderAsync();

@@ -24,12 +24,13 @@ namespace Soltec.Business
             SetDeTransmisionesDal = new SetDeTransmisionesDB(Configuration, Logger2);
         }
 
-        //public async Task<List<SPOS_SQLScripts>> GetSQLScriptsSQLite(string numeroSucursal)
+
+        //public async Task<List<SPOS_SQLScripts>> ObtieneScripts(string numeroSucursal)
         //{
         //    var result = new List<SPOS_SQLScripts>();
         //    try
         //    {
-        //        result = await VentasDB.GetSQLScriptsSQLite(numeroSucursal);
+        //        result = await VentasDB.ObtieneScripts(numeroSucursal);
 
         //        return result;
         //    }
@@ -39,23 +40,6 @@ namespace Soltec.Business
         //        throw;
         //    }
         //}
-
-
-        public async Task<List<SPOS_SQLScripts>> ObtieneScripts(string numeroSucursal)
-        {
-            var result = new List<SPOS_SQLScripts>();
-            try
-            {
-                result = await VentasDB.ObtieneScripts(numeroSucursal);
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Oucrrio un error al obtener los scripts.");
-                throw;
-            }
-        }
 
         public async Task<List<SPOS_SQLScripts>> ObtieneScriptsConCargaInicial(string numeroSucursal)
         {

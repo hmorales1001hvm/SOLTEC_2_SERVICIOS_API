@@ -72,7 +72,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-app.UseAuthentication();   // 👈 JWT clave
+app.UseAuthentication();  
 app.UseAuthorization();
 
 app.MapControllers();
