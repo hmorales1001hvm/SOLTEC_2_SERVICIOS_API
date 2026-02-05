@@ -32,9 +32,10 @@ namespace Soltec.Entities.Ventas
         public int idRegistradoraVenta { get; set; }
         public int idRegistradoraCobro { get; set; }
         public int TipoOperacion { get; set; }
-        public short Procesado { get; set; } // smallint
+        //public short Procesado { get; set; } // smallint
         public DateTime FechaHoraVenta { get; set; }
         public int TipoVenta { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
     public class InventarioCosto
@@ -45,7 +46,8 @@ namespace Soltec.Entities.Ventas
         public decimal? CostoUnitario { get; set; }
 
         public DateTime FechaFactura { get; set; }  
-        public DateTime? FechaSurtido { get; set; }   
+        public DateTime? FechaSurtido { get; set; }
+        public int IdEmpresa { get; set; }
     }
 
     public class VentasProductosDto
@@ -76,6 +78,7 @@ namespace Soltec.Entities.Ventas
         public string Nivel1 { get; set; } = string.Empty;
         public string Nivel2 { get; set; } = string.Empty;
         public string Nivel3 { get; set; } = string.Empty;
+        public int? IdEmpresa { get; set; }
     }
 
     public class VentasImpuestosDto
@@ -90,6 +93,7 @@ namespace Soltec.Entities.Ventas
         public decimal BaseImpuesto { get; set; }
         public decimal ImporteImpuesto { get; set; }
         public int TipoOperacion { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
     public class VentasImpuestosDetalleDto
@@ -106,6 +110,7 @@ namespace Soltec.Entities.Ventas
         public decimal ImporteIVA { get; set; }
         public decimal ImporteVenta { get; set; }
         public int? TipoOperacion { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
     public class VentasDesgloceTotalesDto
@@ -119,6 +124,7 @@ namespace Soltec.Entities.Ventas
         public decimal Impuestos { get; set; }
         public decimal Total { get; set; }
         public int? TipoOperacion { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
     public class VentasImportesProductosDto
@@ -139,6 +145,7 @@ namespace Soltec.Entities.Ventas
         public decimal ImpuestoCalculado { get; set; }
         public decimal Total { get; set; }
         public int? TipoOperacion { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
     public class VentasVendedorCuotasDto
@@ -156,6 +163,7 @@ namespace Soltec.Entities.Ventas
         public decimal MontoDescuento { get; set; }
         public decimal Menudeos { get; set; }
         public decimal MontoIva { get; set; }
+        public int? IdEmpresa { get; set; }
     }
 
 

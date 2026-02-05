@@ -29,8 +29,8 @@ namespace Soltec.Business
             try
             {
                 await TransmisionDAL.MarkOnLine(markOnlineBody);
-                _logger.LogInformation("Sucursal {@Sucursal} registrada con la version {@Version1}",
-                                        markOnlineBody.Sucursal, markOnlineBody.Version1);
+                //_logger.LogInformation("Sucursal {@Sucursal} registrada con la version {@Version1}",
+                                        //markOnlineBody.Sucursal, markOnlineBody.Version1);
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace Soltec.Business
             try
             {
                 var procesos = await TransmisionDAL.GetProcesos();
-                _logger.LogInformation("Se obtuvieron {@Count} procesos", procesos?.Count() ?? 0);
+                //_logger.LogInformation("Se obtuvieron {@Count} procesos", procesos?.Count() ?? 0);
                 return procesos;
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.GetVersionesApp();
-                _logger.LogInformation("Se obtuvieron {@Count} versiones de app", result?.Count() ?? 0);
+                //_logger.LogInformation("Se obtuvieron {@Count} versiones de app", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
@@ -74,7 +74,7 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.ObtieneVersiones();
-                _logger.LogInformation("Se obtuvieron {@Count} versiones activas", result?.Count() ?? 0);
+                //_logger.LogInformation("Se obtuvieron {@Count} versiones activas", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.ObtieneVersiones_SimiPET();
-                _logger.LogInformation("Se obtuvieron {@Count} versiones activas SimiPET", result?.Count() ?? 0);
+                //_logger.LogInformation("Se obtuvieron {@Count} versiones activas SimiPET", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace Soltec.Business
             try
             {
                 var result = await TransmisionDAL.GetMonitorDeApps();
-                _logger.LogInformation("Se obtuvieron {@Count} registros de Monitor de Apps", result?.Count() ?? 0);
+                //_logger.LogInformation("Se obtuvieron {@Count} registros de Monitor de Apps", result?.Count() ?? 0);
                 return result;
             }
             catch (Exception ex)
