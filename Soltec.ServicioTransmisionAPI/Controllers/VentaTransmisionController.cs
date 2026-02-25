@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Soltec.Business;
 using Soltec.DB;
+using Soltec.Entidades.Ventas;
 using Soltec.Entities.Ventas;
 using System.IO.Compression;
 
@@ -21,6 +22,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         public VentaTransmisionController(IConfiguration configuration,
                                             ILogger<VentasDB> logger,
                                             ILogger<SetDeTransmisionesDB> logger2,
+                                            ILogger<ConexionCacheRepository> logger3,
                                             ILogger<VentaTransmisionController> controllerLogger,
                                             IWebHostEnvironment env)
         {
@@ -28,7 +30,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             _logger = controllerLogger;
             _env = env;
 
-            VentasBusiness = new VentasBusiness(Configuration, logger, logger2);
+            VentasBusiness = new VentasBusiness(Configuration, logger, logger2,logger3);
         }
 
 
@@ -382,6 +384,65 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
                 return SoltecErrorMessage(ex);
             }
         }
+
+        [HttpGet("LecturaLog")]
+        public async Task<IActionResult> LecturaLog()
+        {
+            try
+            {
+                string basePath = "/soltec2files/LogsAPI";
+                string fileName = "Log.txt";
+
+                string path = Path.Combine(basePath, fileName);
+
+                if (!System.IO.File.Exists(path))
+                    return NotFound("Log no encontrado en: " + path);
+
+                var lineas = System.IO.File
+                                     .ReadLines(path)
+                                     .Reverse()
+                                     .Take(200)
+                                     .Reverse();
+
+                return Content(string.Join("\n", lineas), "text/plain");
+            }
+            catch (Exception ex)
+            {
+                return SoltecErrorMessage(ex);
+            }
+        }
+
+        [HttpGet("LecturaSucursales")]
+        public async Task<IActionResult> LecturaSucursales([FromQuery] int? idEmpresa = null)
+        {
+            try
+            {
+                string path = "/soltec2files/RutaCache/CacheConexiones.json";
+
+                if (!System.IO.File.Exists(path))
+                    return NotFound("CacheConexiones no encontrado en: " + path);
+
+                string jsonString = await System.IO.File.ReadAllTextAsync(path);
+
+                // Deserializamos a Diccionario<string, ConexionSucursal>
+                var dicSucursales = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, ConexionSucursal>>(jsonString);
+
+                // Si se pasó IdEmpresa, filtramos
+                if (idEmpresa.HasValue)
+                {
+                    dicSucursales = dicSucursales
+                        .Where(kv => kv.Value.IdEmpresa == idEmpresa.Value)
+                        .ToDictionary(kv => kv.Key, kv => kv.Value);
+                }
+
+                return Ok(dicSucursales);
+            }
+            catch (Exception ex)
+            {
+                return SoltecErrorMessage(ex);
+            }
+        }
+
 
 
         [RequestSizeLimit(524288000)]

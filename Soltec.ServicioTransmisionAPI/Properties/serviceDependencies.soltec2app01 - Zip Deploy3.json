@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/soltec2app01-apim/apis/SoltecServicioTransmisionAPI",
+      "type": "apis.azure"
+    }
+  }
+}

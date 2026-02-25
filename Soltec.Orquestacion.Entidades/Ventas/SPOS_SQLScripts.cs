@@ -40,6 +40,7 @@
         public bool ConTransmisionInicial { get; set; }
         public string TicketsFaltantes { get; set; }
         public string TipoCarga { get; set; } = "";
+        public string UrlAPIs { get; set; } = "";
     }
 
     public class ParametrosScripts {

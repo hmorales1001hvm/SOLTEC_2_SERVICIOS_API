@@ -1,4 +1,6 @@
-﻿namespace ApiCommon.Api
+﻿using System;
+
+namespace ApiCommon.Api
 {
     public class ApiResponse
     {

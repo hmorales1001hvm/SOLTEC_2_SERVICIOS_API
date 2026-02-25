@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Soltec.Common.Logger;
 using System.Text;
 using Serilog;
+using MySql.Data.MySqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -36,6 +36,7 @@ namespace Soltec.Entities.Ventas
         public DateTime FechaHoraVenta { get; set; }
         public int TipoVenta { get; set; }
         public int? IdEmpresa { get; set; }
+        public string Id_Venta_Referencia { get; set; } = string.Empty;
     }
 
     public class InventarioCosto
@@ -55,6 +56,8 @@ namespace Soltec.Entities.Ventas
         public DateTime FechaOperacion { get; set; }
         public string ClaveSimi { get; set; } = string.Empty;
         public int? Id_Venta { get; set; }
+        
+        //[JsonPropertyName("Codigo")]
         public string Codigo { get; set; } = string.Empty;
         public string Id_ProductoSAT { get; set; } = string.Empty;
         public int? TipoOperacion { get; set; }

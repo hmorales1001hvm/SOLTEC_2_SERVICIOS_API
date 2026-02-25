@@ -10,18 +10,21 @@ namespace Soltec.Business
         private readonly IConfiguration Configuration;
         private readonly ILogger<VentasDB> Logger;
         private readonly ILogger<SetDeTransmisionesDB> Logger2;
+        private readonly ILogger<ConexionCacheRepository> Logger3;
+
 
         public VentasDB VentasDB;
         public SetDeTransmisionesDB SetDeTransmisionesDal;
         
 
-        public VentasBusiness(IConfiguration configuration, ILogger<VentasDB> logger, ILogger<SetDeTransmisionesDB> logger2)
+        public VentasBusiness(IConfiguration configuration, ILogger<VentasDB> logger, ILogger<SetDeTransmisionesDB> logger2, ILogger<ConexionCacheRepository> logger3)
         {
             Configuration = configuration;
             Logger = logger;
             Logger2 = logger2;
+            Logger3 = logger3;
             VentasDB = new VentasDB(Configuration, Logger);
-            SetDeTransmisionesDal = new SetDeTransmisionesDB(Configuration, Logger2);
+            SetDeTransmisionesDal = new SetDeTransmisionesDB(Configuration, Logger2, Logger3);
         }
 
 
@@ -111,7 +114,6 @@ namespace Soltec.Business
         {
             try
             {
-                Logger.LogInformation($"Procesando Script : {data.NombreProceso}");
                 await SetDeTransmisionesDal.SincronizaScriptUltimo(data);
             }
             catch (Exception ex)
@@ -172,24 +174,6 @@ namespace Soltec.Business
         }
 
         
-
-
-        //public async Task OnLineSalesSqlServerMultiple(ProcesosOnLine data)
-        //{
-        //    try
-        //    {
-        //        Logger.LogInformation($"Procesando el proceso ON LINE para : {data.NombreProceso}");
-        //        /////////////////////////////////////////////////await VentasDAL.OnLineSalesSqlServerMultiple(data);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.LogError(ex, $"Error al guardar el proceso en linea {data.NombreProceso}.");
-        //        throw;
-
-        //    }
-        //}
-
-
         public async Task<byte[]> GetReporteExcel(string rfcEmpresa)
         {
             try
