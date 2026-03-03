@@ -401,7 +401,7 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
                 var lineas = System.IO.File
                                      .ReadLines(path)
                                      .Reverse()
-                                     .Take(200)
+                                     .Take(5000)
                                      .Reverse();
 
                 return Content(string.Join("\n", lineas), "text/plain");
@@ -440,6 +440,40 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             catch (Exception ex)
             {
                 return SoltecErrorMessage(ex);
+            }
+        }
+
+
+        [HttpPost("EliminarCacheSucursales")]
+        public IActionResult EliminarCacheSucursales()
+        {
+            try
+            {
+                string path = "/soltec2files/RutaCache/CacheConexiones.json";
+
+                if (!System.IO.File.Exists(path))
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "CacheConexiones no encontrado en: " + path
+                    });
+
+                System.IO.File.Delete(path);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "CacheConexiones.json eliminado correctamente."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error al eliminar el archivo.",
+                    error = ex.Message
+                });
             }
         }
 

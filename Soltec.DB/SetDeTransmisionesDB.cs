@@ -167,6 +167,9 @@ namespace Soltec.DB
 
                     if (ventasValidas?.Count > 0)
                     {
+
+                        //var table = DataTableAsync(ventasValidas);
+
                         var sw1 = Stopwatch.StartNew();
                         await BulkExecuteAsync(connection, ventasValidas, @"
                                                                         CREATE TABLE #TempVentas (
@@ -222,6 +225,8 @@ namespace Soltec.DB
                     nombreProceso = "VentasProductos";
                     if (ventasProductos?.Count > 0)
                     {
+                        //var table = DataTableAsync(ventasProductos);
+
                         var sw2 = Stopwatch.StartNew();
                         await BulkExecuteAsync(connection, ventasProductos, @"CREATE TABLE #TempVentasProductos (
                                                                             FechaOperacion DATETIME NOT NULL,
@@ -320,6 +325,8 @@ namespace Soltec.DB
 
                     if (ventasImpuestos.Count > 0)
                     {
+                        //var table = DataTableAsync(ventasImpuestos);
+
                         var sw3 = Stopwatch.StartNew();
                         await BulkExecuteAsync(connection, ventasImpuestos, @"CREATE TABLE #TempVentasImpuestos (
                                                                             FechaOperacion DATETIME NOT NULL,
@@ -994,8 +1001,8 @@ namespace Soltec.DB
             var nombreProceso = string.Empty;
             var idEmpresa = conexionEmpresa.IdEmpresa;
 
-            //if (idEmpresa == 263 || idEmpresa == 39)
-            //    Logger.Important($"Procesando el cliente: {idEmpresa}, sucursal: {data.Sucursal}");
+            if (idEmpresa == 19)
+                Logger.Important($"Procesando el cliente: {idEmpresa}, sucursal: {data.Sucursal}");
 
             //if (idEmpresa != 236 && idEmpresa != 39)
             //    return;
@@ -1017,42 +1024,53 @@ namespace Soltec.DB
 
                     if (ventasValidas?.Count > 0)
                     {
-                        await BulkExecuteAsync(connection, ventasValidas, @"
-                                                                        CREATE TABLE #TempVentas (
-                                                                            FechaOperacion DATETIME NOT NULL,
-                                                                            ClaveSimi CHAR(10) NOT NULL,
-                                                                            Id_Venta INT NOT NULL,
-                                                                            id_usuario_venta VARCHAR(50) NOT NULL,
-                                                                            Empleado VARCHAR(100) NOT NULL,
-                                                                            idRegistradora INT NOT NULL,
-                                                                            idRegistradoraVenta INT NOT NULL,
-                                                                            idRegistradoraCobro INT NOT NULL,
-                                                                            TipoOperacion INT NOT NULL,
-                                                                            FechaHoraVenta DATETIME NOT NULL,
-                                                                            TipoVenta INT NOT NULL,
-                                                                            IdEmpresa INT NOT NULL,
-                                                                            Id_Venta_Referencia VARCHAR(13) NULL
-                                                                        );",
-                                                                        "#TempVentas",
-                                                                        @"
-                                                                        INSERT INTO Ventas (
-                                                                            FechaOperacion, ClaveSimi, Id_Venta, IdEmpresa,
-                                                                            id_usuario_venta, Empleado,
-                                                                            idRegistradora, idRegistradoraVenta, idRegistradoraCobro,
-                                                                            TipoOperacion, FechaHoraVenta, TipoVenta, Id_Venta_Referencia
-                                                                        )
-                                                                        SELECT S.FechaOperacion, S.ClaveSimi, S.Id_Venta, S.IdEmpresa,
-                                                                            S.id_usuario_venta, S.Empleado,
-                                                                            S.idRegistradora, S.idRegistradoraVenta, S.idRegistradoraCobro,
-                                                                            S.TipoOperacion, S.FechaHoraVenta, S.TipoVenta, S.Id_Venta_Referencia
-                                                                        FROM #TempVentas S
-                                                                        WHERE NOT EXISTS (
-                                                                            SELECT 1
-                                                                            FROM Ventas T
-                                                                            WHERE T.FechaOperacion = S.FechaOperacion
-                                                                              AND T.ClaveSimi = S.ClaveSimi
-                                                                              AND T.Id_Venta = S.Id_Venta
-                                                                        );");
+                        var table = DataTableAsync(ventasValidas);
+                        using SqlCommand cmd = new SqlCommand("dbo.SP_UpsertVentasVendedorCuotas", connection);
+
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // Asociar el DataTable como parámetro TVP
+                        SqlParameter tvpParam = cmd.Parameters.AddWithValue("@VentasVendedorCuotas", table);
+                        tvpParam.SqlDbType = SqlDbType.Structured;
+                        tvpParam.TypeName = "dbo.TvpVentasVendedorCuotas";
+                        cmd.ExecuteNonQuery();
+
+                        //await BulkExecuteAsync(connection, ventasValidas, @"
+                        //                                                CREATE TABLE #TempVentas (
+                        //                                                    FechaOperacion DATETIME NOT NULL,
+                        //                                                    ClaveSimi CHAR(10) NOT NULL,
+                        //                                                    Id_Venta INT NOT NULL,
+                        //                                                    id_usuario_venta VARCHAR(50) NOT NULL,
+                        //                                                    Empleado VARCHAR(100) NOT NULL,
+                        //                                                    idRegistradora INT NOT NULL,
+                        //                                                    idRegistradoraVenta INT NOT NULL,
+                        //                                                    idRegistradoraCobro INT NOT NULL,
+                        //                                                    TipoOperacion INT NOT NULL,
+                        //                                                    FechaHoraVenta DATETIME NOT NULL,
+                        //                                                    TipoVenta INT NOT NULL,
+                        //                                                    IdEmpresa INT NOT NULL,
+                        //                                                    Id_Venta_Referencia VARCHAR(13) NULL
+                        //                                                );",
+                        //                                                "#TempVentas",
+                        //                                                @"
+                        //                                                INSERT INTO Ventas (
+                        //                                                    FechaOperacion, ClaveSimi, Id_Venta, IdEmpresa,
+                        //                                                    id_usuario_venta, Empleado,
+                        //                                                    idRegistradora, idRegistradoraVenta, idRegistradoraCobro,
+                        //                                                    TipoOperacion, FechaHoraVenta, TipoVenta, Id_Venta_Referencia
+                        //                                                )
+                        //                                                SELECT S.FechaOperacion, S.ClaveSimi, S.Id_Venta, S.IdEmpresa,
+                        //                                                    S.id_usuario_venta, S.Empleado,
+                        //                                                    S.idRegistradora, S.idRegistradoraVenta, S.idRegistradoraCobro,
+                        //                                                    S.TipoOperacion, S.FechaHoraVenta, S.TipoVenta, S.Id_Venta_Referencia
+                        //                                                FROM #TempVentas S
+                        //                                                WHERE NOT EXISTS (
+                        //                                                    SELECT 1
+                        //                                                    FROM Ventas T
+                        //                                                    WHERE T.FechaOperacion = S.FechaOperacion
+                        //                                                      AND T.ClaveSimi = S.ClaveSimi
+                        //                                                      AND T.Id_Venta = S.Id_Venta
+                        //                                                );");
                     }
                 }
 
@@ -1144,6 +1162,8 @@ namespace Soltec.DB
                                                                               AND T.Id_Venta = S.Id_Venta
                                                                               AND T.Codigo = S.Codigo
                                                                         );");
+
+
                         sw2.Stop();
                         if (IMP)
                             Logger.Important(
@@ -1523,7 +1543,7 @@ namespace Soltec.DB
                     FechaHoraTransmision = fechaValida
                 });
 
-                if (idEmpresa == 263 || idEmpresa == 39)
+                if (idEmpresa == 263 || idEmpresa == 39 || idEmpresa==19)
                     Logger.Important($"Sincronización completada correctamente, empresa: {idEmpresa}.");
                 else
                     Logger.Important("Sincronización completada correctamente.");
@@ -1543,6 +1563,20 @@ namespace Soltec.DB
             }
         }
 
+        private async Task<DataTable> DataTableAsync<T>(IEnumerable<T> data)
+        {
+            if (data == null) return null;
+
+            var list = data as IList<T> ?? data.ToList();
+            if (!list.Any()) return null;
+            int attempt = 0;
+            var table = ToDataTable(list);
+            int totalRows = table.Rows.Count;
+
+            return table;
+
+        }
+
 
         private async Task BulkExecuteAsync<T>(SqlConnection connection, IEnumerable<T> data, string tempTableSql, string tempTableName, string executionSql, int batchSizeOverride = -1, int maxRetries = 3)
         {
@@ -1550,11 +1584,8 @@ namespace Soltec.DB
 
             var list = data as IList<T> ?? data.ToList();
             if (!list.Any()) return;
-
             int effectiveBatch = batchSizeOverride > 0 ? batchSizeOverride : batchSize;
-
             int attempt = 0;
-
             while (true)
             {
                 try
@@ -1563,17 +1594,13 @@ namespace Soltec.DB
                     {
                         await dropCmd.ExecuteNonQueryAsync();
                     }
-                    // 1️⃣ Crear tabla temporal
                     using (var createCmd = new SqlCommand(tempTableSql, connection))
                     {
                         createCmd.CommandTimeout = 120;
                         await createCmd.ExecuteNonQueryAsync();
                     }
 
-                    // 2️⃣ Convertir a DataTable
                     var table = ToDataTable(list);
-
-                    // 3️⃣ Bulk insert en batches
                     int totalRows = table.Rows.Count;
 
                     for (int i = 0; i < totalRows; i += effectiveBatch)
@@ -1594,27 +1621,23 @@ namespace Soltec.DB
                         }
                     }
 
-                    // 4️⃣ Ejecutar script (UPDATE + INSERT)
                     using (var execCmd = new SqlCommand(executionSql, connection))
                     {
                         execCmd.CommandTimeout = 600;
                         await execCmd.ExecuteNonQueryAsync();
                     }
 
-
-                    // 5️⃣ Drop temp table
                     using (var dropCmd = new SqlCommand($"DROP TABLE IF EXISTS {tempTableName};", connection))
                     {
                         await dropCmd.ExecuteNonQueryAsync();
                     }
-
-                    break; // éxito → salir del retry loop
+                    break;
                 }
                 catch (SqlException ex) when (ex.Number == 1205 && attempt < maxRetries)
                 {
                     attempt++;
 
-                    int delay = 200 * attempt; // backoff exponencial simple
+                    int delay = 200 * attempt; 
                     await Task.Delay(delay);
 
                     if (attempt >= maxRetries)
