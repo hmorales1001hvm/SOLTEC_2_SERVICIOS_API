@@ -190,57 +190,39 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
             }
         }
 
-
-        [HttpGet("DescargarOnDemandZip")]
-        public async Task<IActionResult> DescargarOnDemandZip()
+        [HttpGet("DescargarScriptZipOnDemand")]
+        public async Task<IActionResult> DescargarScriptZipOnDemand([FromQuery] string sucursal)
         {
             try
             {
-                string pathHistoricos = Path.Combine(_env.ContentRootPath, "Historicos");
+                if (string.IsNullOrEmpty(sucursal))
+                    return BadRequest(new ApiResponse { Success = false, Message = "Parámetro 'sucursal' requerido." });
 
-                if (!Directory.Exists(pathHistoricos))
+                // Ruta correcta usando el directorio actual de la aplicación
+                string pathToSave = Path.Combine(_env.ContentRootPath, "Historicos");
+
+                if (!Directory.Exists(pathToSave))
+                    return NotFound(new ApiResponse { Success = false, Message = "No existe el directorio de históricos." });
+
+                // Nombre esperado del archivo
+                string fileName = $"{sucursal}_DatosHistoricosOnDemand.zip";
+                string filePath = Path.Combine(pathToSave, fileName);
+
+                if (!System.IO.File.Exists(filePath))
+                    return NotFound(new ApiResponse { Success = false, Message = $"No existe el archivo ZIP para la sucursal {sucursal}." });
+
+                // Leer archivo y devolverlo
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    return NotFound(new ApiResponse
-                    {
-                        Success = false,
-                        Message = "No existe el directorio de históricos."
-                    });
+                    await stream.CopyToAsync(memory);
                 }
 
-                // Buscar archivos que contengan _DatosOnDemand
-                var archivos = Directory.GetFiles(pathHistoricos, "*_DatosOnDemand*", SearchOption.TopDirectoryOnly);
-                if (archivos.Length == 0)
-                {
-                    return NotFound(new ApiResponse
-                    {
-                        Success = false,
-                        Message = "No se encontraron archivos OnDemand."
-                    });
-                }
+                memory.Position = 0;
 
-                // Crear ZIP en memoria
-                var memoryStream = new MemoryStream();
-
-                using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                {
-                    foreach (var archivo in archivos)
-                    {
-                        var zipEntry = zip.CreateEntry(Path.GetFileName(archivo), CompressionLevel.Fastest);
-
-                        using var entryStream = zipEntry.Open();
-                        using var fileStream = new FileStream(archivo, FileMode.Open, FileAccess.Read);
-
-                        fileStream.CopyTo(entryStream);
-                    }
-                }
-
-                memoryStream.Position = 0;
-
-                return File(
-                    memoryStream,
-                    "application/zip",
-                    $"DatosOnDemand_{DateTime.Now:yyyyMMddHHmmss}.zip"
-                );
+                return File(memory,
+                            "application/zip",
+                            fileName);
             }
             catch (Exception ex)
             {
@@ -249,7 +231,41 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
         }
 
 
-        [HttpDelete("EliminarOnDemandZip")]
+        [HttpGet("DescargarOnDemandZip")]
+        public async Task<IActionResult> DescargarOnDemandZip()
+        {
+            try
+            {
+                string pathHistoricos = Path.Combine(_env.ContentRootPath, "Historicos");
+
+                var archivos = Directory.GetFiles(pathHistoricos, "*_DatosOnDemand*", SearchOption.TopDirectoryOnly);
+
+                if (archivos.Length == 0)
+                    return NotFound("No hay archivos");
+
+                // Crear archivo temporal
+                string tempZip = Path.Combine(Path.GetTempPath(), $"DatosOnDemand_{Guid.NewGuid()}.zip");
+
+                using (var zip = ZipFile.Open(tempZip, ZipArchiveMode.Create))
+                {
+                    foreach (var archivo in archivos)
+                    {
+                        zip.CreateEntryFromFile(archivo, Path.GetFileName(archivo), CompressionLevel.Fastest);
+                    }
+                }
+
+                var stream = new FileStream(tempZip, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                return File(stream, "application/zip", Path.GetFileName(tempZip));
+            }
+            catch (Exception ex)
+            {
+                return SoltecErrorMessage(ex);
+            }
+        }
+
+       
+        [HttpPost("EliminarOnDemandZip")]
         public IActionResult EliminarOnDemandZip([FromQuery] string fileName)
         {
             try
@@ -263,8 +279,8 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
                     });
                 }
 
-                // Seguridad básica: evitar rutas relativas
-                if (fileName.Contains("..") || fileName.Contains(Path.DirectorySeparatorChar))
+                // Seguridad: validar que solo sea nombre de archivo
+                if (Path.GetFileName(fileName) != fileName)
                 {
                     return BadRequest(new ApiResponse
                     {
@@ -287,8 +303,6 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
 
                 System.IO.File.Delete(filePath);
 
-                //_logger.LogInformation("ZIP eliminado correctamente: {file}", fileName);
-
                 return Ok(new ApiResponse
                 {
                     Success = true,
@@ -301,7 +315,6 @@ namespace Soltec.ServicioTransmisionAPI.Controllers
                 return SoltecErrorMessage(ex);
             }
         }
-
 
 
         [Authorize]

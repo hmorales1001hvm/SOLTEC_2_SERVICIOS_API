@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soltec.Business", "Soltec.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soltec.DB", "Soltec.DB\Soltec.DB.csproj", "{1EAE3226-2BC7-256E-A0DC-3BF0CFD020DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soltec.Orquestacion.Common", "Soltec.Orquestacion.Common\Soltec.Orquestacion.Common.csproj", "{80ED4935-B4D1-47BD-A346-1754BF5E8373}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,14 @@ Global
 		{1EAE3226-2BC7-256E-A0DC-3BF0CFD020DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1EAE3226-2BC7-256E-A0DC-3BF0CFD020DF}.Release|x64.ActiveCfg = Release|Any CPU
 		{1EAE3226-2BC7-256E-A0DC-3BF0CFD020DF}.Release|x64.Build.0 = Release|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Debug|x64.Build.0 = Debug|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Release|x64.ActiveCfg = Release|Any CPU
+		{80ED4935-B4D1-47BD-A346-1754BF5E8373}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

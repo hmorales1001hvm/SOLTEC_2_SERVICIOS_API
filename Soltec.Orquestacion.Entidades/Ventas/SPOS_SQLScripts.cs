@@ -13,7 +13,9 @@
         public bool EsCatalogo { get; set; }
         public int ValorIncrementoDecremento { get; set; }
 		public bool EsSP { get; set; }
-		public string Param1 { get; set; }
+        public string ProcesarDesde { get; set; } = string.Empty;
+        public string ProcesarHasta { get; set; } = string.Empty ;
+        public string Param1 { get; set; }
 		public string Param2 { get; set; }
 		public string Param3 { get; set; }
 		public string Param4 { get; set; }

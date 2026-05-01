@@ -45,6 +45,9 @@ namespace Soltec.DB
                                            SS.EsAPI,
                                            SS.EsCatalogo,
                                            EsSp,
+                                           IFNULL(C.Param1,IFNULL(SS.Param1,'')) ProcesarDesde,
+                                           IFNULL(C.Param2,IFNULL(SS.Param2,'')) ProcesarHasta, 
+
                                            IFNULL(C.Param1,IFNULL(SS.Param1,'')) Param1,
                                            IFNULL(C.Param2,IFNULL(SS.Param2,'')) Param2,
                                            IFNULL(C.Param3,IFNULL(SS.Param3,'')) Param3,
@@ -90,8 +93,10 @@ namespace Soltec.DB
                                            SS.EsAPI,
                                            SS.EsCatalogo,
                                            EsSp,
-                                           sh.Desde Param1,
-                                           sh.Hasta Param2,
+                                           sh.Desde ProcesarDesde,
+                                           sh.Hasta ProcesarHasta, 
+                                           IFNULL(SS.Param1,'') Param1, 
+                                           IFNULL(SS.Param2,'') Param2, 
                                            IFNULL(SS.Param3,'') Param3,
                                            IFNULL(SS.Param4,'') Param4,
                                            IFNULL(SS.Param5,'') Param5,
@@ -121,7 +126,7 @@ namespace Soltec.DB
                                 INNER JOIN catempresa                   EMP ON SC.IdEmpresa = EMP.idEmpresa
                                 INNER JOIN soltec2_orquestador_servidormysql_detalle X ON SQ.IdEmpresa = X.IdEmpresa 
                                 INNER JOIN soltec2_Historicos sh ON SS.IdSQLScript = sh.IdSQLScript AND SC.claveSimi = sh.ClaveSimi AND sh.Activo = 1 AND sh.Estatus='PENDIENTE'
-                                WHERE SS.Activo = 1 AND Tipo IN('DTS') AND SC.claveSimi='" + numeroSucursal + @"'
+                                WHERE SS.Activo = 1 AND Tipo IN('DTS','OND') AND SC.claveSimi='" + numeroSucursal + @"'
 
                                 UNION 
 
@@ -135,8 +140,10 @@ namespace Soltec.DB
                                            SS.EsAPI,
                                            SS.EsCatalogo,
                                            EsSp,
-                                           sh.Desde Param1,
-                                           sh.Hasta Param2,
+                                           sh.Desde ProcesarDesde,
+                                           sh.Hasta ProcesarHasta, 
+                                           IFNULL(SS.Param1,'') Param1, 
+                                           IFNULL(SS.Param2,'') Param2,  
                                            IFNULL(SS.Param3,'') Param3,
                                            IFNULL(SS.Param4,'') Param4,
                                            IFNULL(SS.Param5,'') Param5,
@@ -166,7 +173,8 @@ namespace Soltec.DB
                                 INNER JOIN catempresa                   EMP ON SC.IdEmpresa = EMP.idEmpresa
                                 INNER JOIN soltec2_orquestador_servidormysql_detalle X ON SQ.IdEmpresa = X.IdEmpresa 
                                 INNER JOIN soltec2_TransmisionOnDemand sh ON SS.IdSQLScript = sh.IdSQLScript AND sh.Activo = 1
-                                WHERE SS.Activo = 1 AND Tipo IN('OND') AND SC.claveSimi='" + numeroSucursal + "';";
+                                LEFT JOIN soltec2_Historicos HIST ON SS.IdSQLScript = HIST.IdSQLScript AND SC.claveSimi  = HIST.ClaveSimi AND HIST.Estatus = 'PENDIENTE' AND HIST.Activo =1
+                                WHERE SS.Activo = 1 AND Tipo IN('OND') AND SC.claveSimi='" + numeroSucursal + "' AND HIST.IdSQLScript IS NULL;";
 
             var lstSqlScripts = new List<SPOS_SQLScripts>();
 
@@ -184,9 +192,10 @@ namespace Soltec.DB
                     foreach (var q in lstSqlScripts)
                     {
 
-                        var query = $"SELECT {q.Param1} Param1, " +
+                        var query = $"SELECT " +
+                                    $"{q.Param1} Param1," +
                                     $"{q.Param2} Param2," +
-                                    $"{q.Param3} Param3, " +
+                                    $"{q.Param3} Param3," +
                                     $"{q.Param4} Param4," +
                                     $"{q.Param5} Param5," +
                                     $"{q.Param6} Param6," +
@@ -197,24 +206,24 @@ namespace Soltec.DB
                             $" FROM spos_sqlscripts WHERE IdSqlScript={q.IdSqlScript}";
                         try
                         {
-                            var lst = lstSqlScripts.Where(x => x.IdSqlScript == q.IdSqlScript).FirstOrDefault();
+                            var lst = lstSqlScripts.Where(x => x.IdSqlScript == q.IdSqlScript && x.TipoCarga==q.TipoCarga).FirstOrDefault();
                             string _fechaInicial = string.Empty;
                             string _fechaFinal = string.Empty;
+                            var param = (await connection.QueryFirstOrDefaultAsync<ParametrosScripts>(query, commandType: CommandType.Text, commandTimeout: 600));
 
                             if (q.TipoCarga == "NORMAL")
                             {
-                                var param = (await connection.QueryFirstOrDefaultAsync<ParametrosScripts>(query, commandType: CommandType.Text, commandTimeout: 600));
                                 if (param != null)
                                 {
                                     _fechaInicial = param.Param1;
                                     _fechaFinal = param.Param2;
 
                                     if (param.Param1 != null)
-                                        //lst.SQLScript = q.SQLScript.Replace("Param1", "{" + param.Param1 + "}");
-                                        if (param.Param2 != null)
-                                            //lst.SQLScript = q.SQLScript.Replace("Param2", "{" + param.Param2+ "}");
-                                            if (param.Param3 != null)
-                                                lst.SQLScript = q.SQLScript.Replace("Param3", param.Param3);
+                                        lst.SQLScript = q.SQLScript.Replace("Param1", param.Param1);
+                                    if (param.Param2 != null)
+                                        lst.SQLScript = q.SQLScript.Replace("Param2", param.Param2);
+                                    if (param.Param3 != null)
+                                        lst.SQLScript = q.SQLScript.Replace("Param3", param.Param3);
                                     if (param.Param4 != null)
                                         lst.SQLScript = q.SQLScript.Replace("Param4", param.Param4);
                                     if (param.Param5 != null)
@@ -233,16 +242,36 @@ namespace Soltec.DB
                             }
                             else if (q.TipoCarga == "HISTORICO")
                             {
-                                _fechaInicial = q.Param1;
-                                _fechaFinal = q.Param2;
+                                _fechaInicial = q.ProcesarDesde;
+                                _fechaFinal = q.ProcesarHasta;
+
+                                //if (lst.ProcesarDesde != null)
+                                //    lst.SQLScript = q.SQLScript.Replace("Param1", param.Param1);
+                                //if (lst.ProcesarHasta != null)
+                                //    lst.SQLScript = q.SQLScript.Replace("Param2", param.Param2);
+                                if (q.ProcesarDesde != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param1", q.ProcesarDesde.Split(' ')[0]);
+                                if (q.ProcesarHasta != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param2", q.ProcesarHasta.Split(' ')[0]);
+                                if (param.Param3 != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param3", param.Param3);
+                                if (param.Param4 != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param4", param.Param4);
+                                if (param.Param5 != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param5", param.Param5);
                             }
                             else if (q.TipoCarga == "ONDEMAND")
                             {
-                                _fechaInicial = q.Param1;
-                                _fechaFinal = q.Param2;
+                                _fechaInicial = q.ProcesarDesde;
+                                _fechaFinal = q.ProcesarHasta;
+
+                                if (param.Param1 != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param1", param.Param1);
+                                if (param.Param2 != null)
+                                    lst.SQLScript = q.SQLScript.Replace("Param2", param.Param2);
                             }
 
-                            scripts.Add(new SPOS_SQLScripts()
+                        scripts.Add(new SPOS_SQLScripts()
                             {
                                 Activo = lst.Activo,
                                 Condicion = lst.Condicion,
@@ -282,7 +311,10 @@ namespace Soltec.DB
                                 ConTransmisionInicial = lst.ConTransmisionInicial,
                                 TicketsFaltantes = lst.TicketsFaltantes,
                                 TipoCarga = q.TipoCarga,
-                                UrlAPIs = lst.UrlAPIs
+                                UrlAPIs = lst.UrlAPIs, 
+                                ProcesarDesde = lst.ProcesarDesde,
+                                ProcesarHasta = lst.ProcesarHasta
+                                
                             });
                         }
                         catch (Exception ex)
